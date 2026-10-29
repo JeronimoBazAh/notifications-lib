@@ -8,7 +8,7 @@ frameworks y **sin dependencias en runtime**. Cambiar de proveedor es cambiar un
 Todavía no está publicada en un repositorio remoto: instálala en tu repositorio local de Maven.
 
 ```bash
-git clone <url-del-repo> && cd notifications-lib
+git clone https://github.com/JeronimoBazAh/notifications-lib.git && cd notifications-lib
 mvn clean install
 ```
 
