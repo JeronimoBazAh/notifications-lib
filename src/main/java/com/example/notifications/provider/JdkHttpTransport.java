@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Real HTTP transport on top of the JDK's {@link HttpClient} (no dependencies). Timeouts are mandatory:
- * a provider that hangs must not hang the caller. Timeouts and I/O errors surface as {@link IOException}, which
- * the providers classify as retryable. Caveat: retrying a POST that timed out AFTER the provider accepted it
- * can duplicate a message; use provider-side idempotency features where they exist.
+ * Transporte HTTP real basado en el {@link HttpClient} del JDK (sin dependencias). Los tiempos de espera (*timeouts*) son obligatorios:
+ * un proveedor que se quede bloqueado no debe provocar el bloqueo de quien realiza la llamada. Los tiempos de espera y los errores de E/S se manifiestan como {@link IOException}, los cuales
+ * los proveedores clasifican como reintentables. Advertencia: reintentar una solicitud POST que agotó su tiempo de espera DESPUÉS de haber sido aceptada por el proveedor
+ * puede duplicar un mensaje; utilice mecanismos de idempotencia en el lado del proveedor, siempre que estén disponibles.
  */
 public final class JdkHttpTransport implements Transport {
     private final HttpClient client;

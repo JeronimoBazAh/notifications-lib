@@ -9,15 +9,15 @@ import static com.example.notifications.model.Validation.copyOf;
 import static com.example.notifications.model.Validation.hasText;
 import static com.example.notifications.model.Validation.isE164;
 
-/** SMS message. {@code from} is optional: providers fall back to their configured sender / messaging service. */
-public record SmsNotification(
+/** Mensaje SMS. {@code from} es opcional: los proveedores recurren al remitente o servicio de mensajería que tengan configurado. */
+public record SmsNotificacion(
         String id, Instant createdAt, String to, String from, String body, Map<String, String> metadata)
-        implements Notification {
+        implements Notificacion {
 
-    /** Twilio's documented maximum body length. */
+    /** Longitud máxima del cuerpo documentada por Twilio. */
     public static final int MAX_BODY_LENGTH = 1600;
 
-    public SmsNotification {
+    public SmsNotificacion {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         metadata = copyOf(metadata);
@@ -32,8 +32,8 @@ public record SmsNotification(
     }
 
     @Override
-    public ChannelType channel() {
-        return ChannelType.SMS;
+    public TipoCanal channel() {
+        return TipoCanal.SMS;
     }
 
     public static Builder builder() {
@@ -55,8 +55,8 @@ public record SmsNotification(
         public Builder body(String body) { this.body = body; return this; }
         public Builder metadata(String key, String value) { this.metadata.put(key, value); return this; }
 
-        public SmsNotification build() {
-            return new SmsNotification(id, null, to, from, body, metadata);
+        public SmsNotificacion build() {
+            return new SmsNotificacion(id, null, to, from, body, metadata);
         }
     }
 }

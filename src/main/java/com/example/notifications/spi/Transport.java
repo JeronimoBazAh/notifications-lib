@@ -3,8 +3,10 @@ package com.example.notifications.spi;
 import java.io.IOException;
 
 /**
- * Seam between a provider and the network. Real implementation: wrap {@code java.net.http.HttpClient}.
- * Simulated / test implementation: a lambda. This is what makes providers testable without mocks or sockets.
+ * Punto de conexión entre un proveedor y la red. Implementación real: envoltorio de {@code java.net.http.HttpClient}.
+ * Implementación simulada o de prueba: una expresión lambda. Esto es lo que permite probar los proveedores sin necesidad de *mocks* ni *sockets*.
+
+
  */
 @FunctionalInterface
 public interface Transport {

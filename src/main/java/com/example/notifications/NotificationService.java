@@ -1,8 +1,8 @@
 package com.example.notifications;
 
 import com.example.notifications.event.NotificationListener;
-import com.example.notifications.model.ChannelType;
-import com.example.notifications.model.Notification;
+import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.Notificacion;
 import com.example.notifications.spi.NotificationProvider;
 
 import java.util.ArrayList;
@@ -17,11 +17,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Public facade of the library. It owns configuration and the sync/async API; the delivery algorithm
- * (routing, retry, failover, events) lives in {@link DeliveryPipeline}.
- * <p>
- * Adding a channel or a provider never requires changing this class (Open/Closed): they are just registered
- * in the {@link Builder}.
+ * Interfaz pública de la biblioteca. Esta gestiona la configuración y la API (síncrona/asíncrona); el algoritmo de entrega
+ * (enrutamiento, reintento, conmutación por error, eventos) reside en {@link DeliveryPipeline}.
+
+ * Añadir un canal o un proveedor nunca requiere modificar esta clase (principio abierto/cerrado): simplemente se registran
+ * en el {@link Builder}.
  */
 public final class NotificationService implements AutoCloseable {
     private final DeliveryPipeline pipeline;
@@ -29,7 +29,7 @@ public final class NotificationService implements AutoCloseable {
     private final ExecutorService ownedExecutor;
 
     private NotificationService(Builder b) {
-        Map<ChannelType, List<NotificationProvider<?>>> copy = new LinkedHashMap<>();
+        Map<TipoCanal, List<NotificationProvider<?>>> copy = new LinkedHashMap<>();
         b.providers.forEach((channel, list) -> copy.put(channel, List.copyOf(list)));
         this.pipeline = new DeliveryPipeline(Map.copyOf(copy), b.retryPolicy, b.failoverPolicy, b.sleeper,
                 new EventPublisher(b.listeners));
@@ -47,27 +47,26 @@ public final class NotificationService implements AutoCloseable {
         return new Builder();
     }
 
-    /** Sends synchronously. Never throws for delivery problems: inspect the returned {@link SendResult}. */
-    public SendResult send(Notification notification) {
-        Objects.requireNonNull(notification, "notification");
-        return pipeline.deliver(notification);
+    /** Realiza el envío de forma síncrona. Nunca lanza excepciones ante problemas de entrega: examina el {@link SendResult} devuelto. */
+    public SendResult send(Notificacion notificacion) {
+        Objects.requireNonNull(notificacion, "notification");
+        return pipeline.deliver(notificacion);
     }
 
-    /** Non-blocking send. The future completes normally even if delivery fails (see {@link SendResult#error()}). */
-    public CompletableFuture<SendResult> sendAsync(Notification notification) {
-        Objects.requireNonNull(notification, "notification");
-        return CompletableFuture.supplyAsync(() -> pipeline.deliver(notification), executor);
+    /** Envío no bloqueante. El objeto «future» se completa con normalidad incluso si la entrega falla (véase {@link SendResult#error()}). */
+    public CompletableFuture<SendResult> sendAsync(Notificacion notificacion) {
+        Objects.requireNonNull(notificacion, "notification");
+        return CompletableFuture.supplyAsync(() -> pipeline.deliver(notificacion), executor);
     }
 
-    /** Sends many notifications concurrently. Results keep input order; one failure does not affect the rest. */
-    public CompletableFuture<List<SendResult>> sendAll(Collection<? extends Notification> notifications) {
+    /** Envía múltiples notificaciones de forma concurrente. Los resultados mantienen el orden de entrada; un fallo no afecta al resto. */
+    public CompletableFuture<List<SendResult>> sendAll(Collection<? extends Notificacion> notifications) {
         List<CompletableFuture<SendResult>> futures = notifications.stream().map(this::sendAsync).toList();
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
                 .thenApply(v -> futures.stream().map(CompletableFuture::join).toList());
     }
 
-    /** Shuts down the internal executor (if the caller did not supply their own). */
-    @Override
+    /** Cierra el ejecutor interno (si quien realiza la llamada no proporcionó el suyo propio). */    @Override
     public void close() {
         if (ownedExecutor != null) {
             ownedExecutor.shutdown();
@@ -75,14 +74,14 @@ public final class NotificationService implements AutoCloseable {
     }
 
     public static final class Builder {
-        private final Map<ChannelType, List<NotificationProvider<?>>> providers = new LinkedHashMap<>();
+        private final Map<TipoCanal, List<NotificationProvider<?>>> providers = new LinkedHashMap<>();
         private final List<NotificationListener> listeners = new ArrayList<>();
         private RetryPolicy retryPolicy = RetryPolicy.none();
         private FailoverPolicy failoverPolicy = FailoverPolicy.ALWAYS;
         private Executor executor;
         private Sleeper sleeper = Sleeper.THREAD;
 
-        /** Registration order is priority order per channel: first = primary, the rest = fallbacks. */
+        /** El orden de registro determina la prioridad por canal: el primero es el principal; los demás, alternativas. */
         public Builder provider(NotificationProvider<?> provider) {
             Objects.requireNonNull(provider, "provider");
             providers.computeIfAbsent(provider.channel(), c -> new ArrayList<>()).add(provider);
@@ -104,13 +103,13 @@ public final class NotificationService implements AutoCloseable {
             return this;
         }
 
-        /** Executor for async sends. The caller keeps ownership: the service will not shut it down. */
+        /** Ejecutor para envíos asíncronos. Quien realiza la llamada conserva la propiedad: el servicio no lo cerrará. */
         public Builder executor(Executor executor) {
             this.executor = Objects.requireNonNull(executor, "executor");
             return this;
         }
 
-        /** Mainly for tests: replaces real sleeping between retries. */
+        /** Principalmente para pruebas: sustituye la pausa real entre reintentos. */
         public Builder sleeper(Sleeper sleeper) {
             this.sleeper = Objects.requireNonNull(sleeper, "sleeper");
             return this;

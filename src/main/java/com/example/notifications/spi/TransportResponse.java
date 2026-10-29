@@ -4,7 +4,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-/** Minimal HTTP response. Header names are case-insensitive, as in HTTP (HTTP/2 lowercases them). */
+/** Respuesta HTTP mínima. Los nombres de los encabezados no distinguen entre mayúsculas y minúsculas, tal como ocurre en HTTP (
+ * en HTTP/2, aparecen en minúsculas).
+
+ */
 public record TransportResponse(int status, Map<String, String> headers, String body) {
     public TransportResponse {
         Map<String, String> caseInsensitive = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);

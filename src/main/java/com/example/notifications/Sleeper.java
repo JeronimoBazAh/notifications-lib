@@ -2,7 +2,7 @@ package com.example.notifications;
 
 import java.time.Duration;
 
-/** Abstraction over waiting between retries so tests don't actually sleep. */
+/** Abstracción de la espera entre reintentos, de modo que las pruebas no realicen pausas reales. */
 @FunctionalInterface
 public interface Sleeper {
     Sleeper THREAD = d -> Thread.sleep(d.toMillis());

@@ -3,9 +3,9 @@ package com.example.notifications;
 import java.util.Objects;
 
 /**
- * Wraps a credential so it cannot leak through {@code toString()}, logs or debuggers' string views.
- * The raw value is only reachable through the explicit {@link #reveal()} call, which providers use
- * at the very last moment (when building the Authorization header).
+ * Envuelve una credencial de modo que no pueda filtrarse a través de {@code toString()}, registros (logs) o visualizaciones de cadenas en depuradores.
+ * El valor original solo es accesible mediante una llamada explícita a {@link #reveal()}, la cual es utilizada por los proveedores
+ * en el último momento posible (al construir la cabecera Authorization).
  */
 public final class Secret {
     private final String value;
@@ -22,7 +22,7 @@ public final class Secret {
         return new Secret(value);
     }
 
-    /** Reads the secret from an environment variable. Fails fast if it is missing. */
+    /** Lee el secreto de una variable de entorno. Falla de inmediato si no está presente. */
     public static Secret fromEnv(String variable) {
         String v = System.getenv(variable);
         if (v == null || v.isBlank()) {

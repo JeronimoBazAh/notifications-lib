@@ -1,19 +1,19 @@
 package com.example.notifications;
 
 import com.example.notifications.error.NotificationException;
-import com.example.notifications.model.ChannelType;
+import com.example.notifications.model.TipoCanal;
 
 /**
- * Outcome of a send. Delivery failures are returned as DATA (never thrown), which keeps batch and async
- * flows simple. Callers who prefer exceptions can call {@link #orElseThrow()}.
+ * Resultado de un envío. Los errores de entrega se devuelven como DATOS (nunca generados), lo que mantiene el proceso por lotes y asíncrono
+ * fluye simple. Las personas que llaman y prefieren excepciones pueden llamar a {@link #orElseThrow()}.
  *
- * @param provider          provider that delivered, or the last one tried on failure (null if none)
- * @param providerMessageId provider-side id on success, null on failure
- * @param attempts          total attempts made, across providers
- * @param error             null on success
+ * @param provider proveedor que entregó, o el último que intentó en caso de error (nulo si no hay ninguno)
+ * @param providerMessageId ID del lado del proveedor en caso de éxito, nulo en caso de error
+ * @param attempts el total de intentos realizados, entre proveedores
+ * @param error nulo en caso de éxito
  */
 public record SendResult(
-        String notificationId, ChannelType channel, Status status, String provider,
+        String notificationId, TipoCanal channel, Status status, String provider,
         String providerMessageId, int attempts, NotificationException error) {
 
     public enum Status { SENT, FAILED }
@@ -30,11 +30,11 @@ public record SendResult(
         return this;
     }
 
-    static SendResult success(String id, ChannelType channel, String provider, String messageId, int attempts) {
+    static SendResult success(String id, TipoCanal channel, String provider, String messageId, int attempts) {
         return new SendResult(id, channel, Status.SENT, provider, messageId, attempts, null);
     }
 
-    static SendResult failure(String id, ChannelType channel, String provider, int attempts, NotificationException error) {
+    static SendResult failure(String id, TipoCanal channel, String provider, int attempts, NotificationException error) {
         return new SendResult(id, channel, Status.FAILED, provider, null, attempts, error);
     }
 }

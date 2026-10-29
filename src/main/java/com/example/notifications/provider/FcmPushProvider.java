@@ -2,8 +2,8 @@ package com.example.notifications.provider;
 
 import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.ChannelType;
-import com.example.notifications.model.PushNotification;
+import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.PushNotificacion;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -16,14 +16,14 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * Firebase Cloud Messaging HTTP v1: {@code POST /v1/projects/{project}/messages:send}, Bearer OAuth2
- * access token, JSON body {@code {"message":{"token"|"topic", "notification":{...}, "data":{...}}}}.
- * Success is {@code 200} with {@code {"name":"projects/{project}/messages/{id}"}}.
- * <p>
- * FCM access tokens are short-lived (~1h), so the provider takes a {@code Supplier<Secret>} that the
- * caller backs with their token refresh logic (e.g. Google service-account credentials).
+ * Firebase Cloud Messaging HTTP v1: {@code POST /v1/projects/{project}/messages:send}, token de acceso OAuth2 (tipo Bearer),
+ *  * cuerpo JSON {@code {"message":{"token"|"topic", "notification":{...}, "data":{...}}}}.
+ *  * Una operación exitosa devuelve un código {@code 200} junto con {@code {"name":"projects/{project}/messages/{id}"}}.
+ *  * <p>
+ *  * Los tokens de acceso de FCM tienen una vida útil corta (~1 h); por ello, el proveedor acepta un {@code Supplier<Secret>}
+ *  * que el emisor implementa incluyendo su propia lógica de renovación de tokens (por ejemplo, mediante credenciales de cuenta de servicio de Google).
  */
-public final class FcmPushProvider implements NotificationProvider<PushNotification> {
+public final class FcmPushProvider implements NotificationProvider<PushNotificacion> {
     public static final String NAME = "fcm";
 
     private final String projectId;
@@ -41,11 +41,11 @@ public final class FcmPushProvider implements NotificationProvider<PushNotificat
     }
 
     @Override public String name() { return NAME; }
-    @Override public ChannelType channel() { return ChannelType.PUSH; }
-    @Override public Class<PushNotification> notificationType() { return PushNotification.class; }
+    @Override public TipoCanal channel() { return TipoCanal.PUSH; }
+    @Override public Class<PushNotificacion> notificationType() { return PushNotificacion.class; }
 
     @Override
-    public ProviderResponse send(PushNotification n) throws SendException {
+    public ProviderResponse send(PushNotificacion n) throws SendException {
         Map<String, Object> message = new LinkedHashMap<>();
         if (n.deviceToken() != null && !n.deviceToken().isBlank()) message.put("token", n.deviceToken());
         else message.put("topic", n.topic());

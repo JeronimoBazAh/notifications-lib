@@ -4,18 +4,18 @@ import java.time.Instant;
 import java.util.Map;
 
 /**
- * Common contract of every notification. Each channel defines its own immutable, self-validating
- * implementation (an email has a subject, an SMS does not), so channel differences are expressed in the
- * type system instead of in a generic {@code Map<String, Object>}.
+ * Contrato común para toda notificación. Cada canal define su propia implementación inmutable y autovalidante
+ * (un correo electrónico tiene un asunto, un SMS no); por tanto, las diferencias entre canales se expresan a través del
+ * sistema de tipos, en lugar de mediante un {@code Map<String, Object>} genérico.
  */
-public interface Notification {
-    /** Unique id, useful for correlation and idempotency on the caller side. */
+public interface Notificacion {
+    /** Identificador único, útil para la correlación y la idempotencia por parte de quien realiza la llamada. */
     String id();
 
-    ChannelType channel();
+    TipoCanal channel();
 
     Instant createdAt();
 
-    /** Free-form caller data (tenant, correlation id...). Never sent to providers. */
+    /** Datos del llamante en formato libre (inquilino, ID de correlación...). Nunca se envían a los proveedores. */
     Map<String, String> metadata();
 }

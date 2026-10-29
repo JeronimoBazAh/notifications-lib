@@ -1,8 +1,8 @@
 package com.example.notifications.error;
 
 /**
- * Delivery failed on the provider side (or on the way to it).
- * {@link #isRetryable()} tells the service whether trying again makes sense.
+ * La entrega falló por parte del proveedor (o durante el trayecto hacia él).
+ * {@link #isRetryable()} indica al servicio si tiene sentido realizar un nuevo intento.
  */
 public final class SendException extends NotificationException {
     private static final long serialVersionUID = 1L;
@@ -20,7 +20,7 @@ public final class SendException extends NotificationException {
         this(code, provider, retryable, message, null);
     }
 
-    /** Provider name, or {@code null} if no provider was involved. */
+    /** Nombre del proveedor, o {@code null} si no intervino ningún proveedor. */
     public String provider() {
         return provider;
     }

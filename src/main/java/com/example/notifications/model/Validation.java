@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/** Collects violations so the caller gets every problem at once. Package-private helper. */
+/** Recopila infracciones para que quien realiza la llamada obtenga todos los problemas de una sola vez. Clase auxiliar con visibilidad de paquete. */
 final class Validation {
     private static final Pattern EMAIL =
             Pattern.compile("^[A-Za-z0-9._%+\\-]+@[A-Za-z0-9\\-]+(\\.[A-Za-z0-9\\-]+)*\\.[A-Za-z]{2,}$");
-    /** E.164: '+', country code (no leading zero), up to 15 digits total. Same format Twilio requires. */
+    /** E.164: '+', código de país (sin cero inicial), hasta 15 dígitos en total. Es el mismo formato que exige Twilio. */
     private static final Pattern E164 = Pattern.compile("^\\+[1-9]\\d{6,14}$");
 
     private final List<String> violations = new ArrayList<>();
@@ -42,7 +42,7 @@ final class Validation {
         return s != null && E164.matcher(s).matches();
     }
 
-    /** Null-safe immutable copy; null elements become "" so they are reported as invalid, not as NPE. */
+    /** Copia inmutable segura frente a valores nulos; los elementos nulos se convierten en "" para que se reporten como no válidos, en lugar de provocar un NPE. */
     static List<String> copyOf(List<String> list) {
         return list == null ? List.of() : list.stream().map(s -> s == null ? "" : s).toList();
     }

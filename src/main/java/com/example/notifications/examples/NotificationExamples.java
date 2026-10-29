@@ -6,11 +6,11 @@ import com.example.notifications.RetryPolicy;
 import com.example.notifications.Secret;
 import com.example.notifications.SendResult;
 import com.example.notifications.error.ValidationException;
-import com.example.notifications.model.EmailNotification;
-import com.example.notifications.model.Notification;
-import com.example.notifications.model.PushNotification;
-import com.example.notifications.model.SlackNotification;
-import com.example.notifications.model.SmsNotification;
+import com.example.notifications.model.EmailNotificacion;
+import com.example.notifications.model.Notificacion;
+import com.example.notifications.model.PushNotificacion;
+import com.example.notifications.model.SlackNotificacion;
+import com.example.notifications.model.SmsNotificacion;
 import com.example.notifications.provider.FcmPushProvider;
 import com.example.notifications.provider.MailgunEmailProvider;
 import com.example.notifications.provider.SendGridEmailProvider;
@@ -23,7 +23,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-/** Runnable demo. Everything is simulated: no network, no real credentials. */
+/** Demostración ejecutable. Todo está simulado: sin red, sin credenciales reales. */
 public final class NotificationExamples {
 
     public static void main(String[] args) {
@@ -41,17 +41,17 @@ public final class NotificationExamples {
             title("1) Same API for every channel");
             MessageTemplate welcome = MessageTemplate.of("Hi {{name}}, your code is {{code}}");
             Map<String, String> vars = Map.of("name", "Ana", "code", "4821");
-            show(service.send(EmailNotification.builder().from("no-reply@acme.com").to("ana@example.com")
+            show(service.send(EmailNotificacion.builder().from("no-reply@acme.com").to("ana@example.com")
                     .subject("Welcome").textBody(welcome.render(vars))
                     .htmlBody(MessageTemplate.of("<b>Hi {{name}}</b>").renderHtml(vars)).build()));
-            show(service.send(SmsNotification.builder().to("+5493515551234").body(welcome.render(vars)).build()));
-            show(service.send(PushNotification.builder().deviceToken("fcm-token-123").title("Transfer received")
+            show(service.send(SmsNotificacion.builder().to("+5493515551234").body(welcome.render(vars)).build()));
+            show(service.send(PushNotificacion.builder().deviceToken("fcm-token-123").title("Transfer received")
                     .body("You received $100").data("txId", "tx-42").build()));
-            show(service.send(SlackNotification.builder().target("#alerts").text("Deploy finished").build()));
+            show(service.send(SlackNotificacion.builder().target("#alerts").text("Deploy finished").build()));
 
             title("2) Validation: every violation reported at once, before anything is sent");
             try {
-                EmailNotification.builder().from("not-an-email").subject(" ").build();
+                EmailNotificacion.builder().from("not-an-email").subject(" ").build();
             } catch (ValidationException e) {
                 e.violations().forEach(v -> System.out.println("  - " + v));
             }
@@ -65,15 +65,15 @@ public final class NotificationExamples {
                     .failoverPolicy(FailoverPolicy.ALWAYS)
                     .listener(e -> System.out.println("  event: " + e.type() + " via " + e.provider()))
                     .build()) {
-                show(resilient.send(EmailNotification.builder().from("no-reply@acme.com")
+                show(resilient.send(EmailNotificacion.builder().from("no-reply@acme.com")
                         .to("ana@example.com").subject("Failover demo").textBody("hello").build()));
             }
 
             title("4) Async batch (virtual threads)");
-            List<Notification> batch = List.of(
-                    SmsNotification.builder().to("+5493515550001").body("Hi 1").build(),
-                    SmsNotification.builder().to("+5493515550002").body("Hi 2").build(),
-                    SmsNotification.builder().to("+5493515550003").body("Hi 3").build());
+            List<Notificacion> batch = List.of(
+                    SmsNotificacion.builder().to("+5493515550001").body("Hi 1").build(),
+                    SmsNotificacion.builder().to("+5493515550002").body("Hi 2").build(),
+                    SmsNotificacion.builder().to("+5493515550003").body("Hi 3").build());
             service.sendAll(batch).join().forEach(NotificationExamples::show);
         }
     }

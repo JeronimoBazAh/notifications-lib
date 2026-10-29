@@ -9,17 +9,17 @@ import static com.example.notifications.model.Validation.copyOf;
 import static com.example.notifications.model.Validation.hasText;
 
 /**
- * Slack message. {@code target} is a channel id or name ("#alerts"); it is NOT called "channel" because
- * {@link Notification#channel()} already means the delivery channel type. {@code threadTs} replies in a thread.
+ * Mensaje de Slack. {@code target} es el ID o nombre de un canal (p. ej., "#alerts"); no se denomina "channel" porque
+ * {@link Notificacion#channel()} ya hace referencia al tipo de canal de entrega. {@code threadTs} permite responder dentro de un hilo.
  */
-public record SlackNotification(
+public record SlackNotificacion(
         String id, Instant createdAt, String target, String text, String threadTs, Map<String, String> metadata)
-        implements Notification {
+        implements Notificacion {
 
-    /** Slack truncates messages longer than 40,000 characters. */
+    /** Slack trunca los mensajes que superan los 40 000 caracteres. */
     public static final int MAX_TEXT_LENGTH = 40_000;
 
-    public SlackNotification {
+    public SlackNotificacion {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         metadata = copyOf(metadata);
@@ -32,8 +32,8 @@ public record SlackNotification(
     }
 
     @Override
-    public ChannelType channel() {
-        return ChannelType.SLACK;
+    public TipoCanal channel() {
+        return TipoCanal.SLACK;
     }
 
     public static Builder builder() {
@@ -55,8 +55,8 @@ public record SlackNotification(
         public Builder threadTs(String v) { threadTs = v; return this; }
         public Builder metadata(String k, String v) { metadata.put(k, v); return this; }
 
-        public SlackNotification build() {
-            return new SlackNotification(id, null, target, text, threadTs, metadata);
+        public SlackNotificacion build() {
+            return new SlackNotificacion(id, null, target, text, threadTs, metadata);
         }
     }
 }

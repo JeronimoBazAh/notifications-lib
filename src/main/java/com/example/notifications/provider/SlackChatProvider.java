@@ -3,8 +3,8 @@ package com.example.notifications.provider;
 import com.example.notifications.Secret;
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.ChannelType;
-import com.example.notifications.model.SlackNotification;
+import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.SlackNotificacion;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Slack Web API {@code chat.postMessage}: POST with Bearer bot token and JSON body {channel, text, thread_ts?}.
- * GOTCHA: Slack answers HTTP 200 even on failure, with {@code {"ok":false,"error":"channel_not_found"}}.
- * Success is {@code {"ok":true,"channel":"C..","ts":"1700000000.000100"}}; {@code ts} identifies the message.
+ * Slack Web API {@code chat.postMessage}: petición POST con un token de bot (tipo Bearer) y un cuerpo JSON {channel, text, thread_ts?}.
+ * OJO: Slack devuelve un código HTTP 200 incluso en caso de error, con el formato {@code {"ok":false,"error":"channel_not_found"}}.
+ * En caso de éxito, la respuesta es {@code {"ok":true,"channel":"C..","ts":"1700000000.000100"}}; el campo {@code ts} identifica el mensaje.
  */
-public final class SlackChatProvider implements NotificationProvider<SlackNotification> {
+public final class SlackChatProvider implements NotificationProvider<SlackNotificacion> {
     public static final String NAME = "slack";
 
     private final Secret botToken;
@@ -36,11 +36,11 @@ public final class SlackChatProvider implements NotificationProvider<SlackNotifi
     }
 
     @Override public String name() { return NAME; }
-    @Override public ChannelType channel() { return ChannelType.SLACK; }
-    @Override public Class<SlackNotification> notificationType() { return SlackNotification.class; }
+    @Override public TipoCanal channel() { return TipoCanal.SLACK; }
+    @Override public Class<SlackNotificacion> notificationType() { return SlackNotificacion.class; }
 
     @Override
-    public ProviderResponse send(SlackNotification n) throws SendException {
+    public ProviderResponse send(SlackNotificacion n) throws SendException {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("channel", n.target());
         payload.put("text", n.text());

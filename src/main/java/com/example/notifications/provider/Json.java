@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Tiny JSON writer (Map / List / String / Number / Boolean / null) so the library needs no dependency.
- * Swap for Jackson/Gson in a real deployment if payloads get richer.
+ * Generador de JSON minimalista (compatible con Map, List, String, Number, Boolean y null), por lo que la biblioteca no requiere dependencias.
+ * En un entorno de producción real, sustitúyelo por Jackson o Gson si las estructuras de datos (payloads) se vuelven más complejas.
  */
 public final class Json {
     private Json() {

@@ -11,8 +11,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Minimal {@code {{variable}}} template. A missing variable is a {@link ValidationException}
- * (never silently rendered as empty). Use {@link #renderHtml} for HTML bodies: values are escaped.
+ * Plantilla mínima {@code {{variable}}}. Si falta una variable, se produce una {@link ValidationException}
+ * (nunca se renderiza silenciosamente como un valor vacío). Utilice {@link #renderHtml} para cuerpos HTML: los valores se escapan.
+
+
  */
 public final class MessageTemplate {
     private static final Pattern VARIABLE = Pattern.compile("\\{\\{\\s*([A-Za-z0-9_.]+)\\s*}}");
@@ -37,12 +39,12 @@ public final class MessageTemplate {
         return names;
     }
 
-    /** Plain-text rendering (SMS, push, email text part). */
+    /** Representación en texto plano (SMS, notificaciones push, parte de texto de un correo electrónico). */
     public String render(Map<String, String> values) {
         return replace(values, false);
     }
 
-    /** HTML rendering: every substituted value is HTML-escaped to prevent injection. */
+    /** Renderizado HTML: cada valor sustituido se somete a escape HTML para evitar inyecciones. */
     public String renderHtml(Map<String, String> values) {
         return replace(values, true);
     }

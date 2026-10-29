@@ -9,14 +9,14 @@ import static com.example.notifications.model.Validation.copyOf;
 import static com.example.notifications.model.Validation.hasText;
 
 /**
- * Mobile push. Exactly one target: a {@code deviceToken} or a {@code topic}.
- * {@code data} is a String-to-String map because FCM (and APNs custom keys) only accept string values.
+ * Notificación push para móviles. Un único destino: un {@code deviceToken} o un {@code topic}.
+ * {@code data} es un mapa de cadenas (String a String), ya que FCM (así como las claves personalizadas de APNs) solo admite valores de tipo cadena.
  */
-public record PushNotification(
+public record PushNotificacion(
         String id, Instant createdAt, String deviceToken, String topic, String title, String body,
-        Map<String, String> data, Map<String, String> metadata) implements Notification {
+        Map<String, String> data, Map<String, String> metadata) implements Notificacion {
 
-    public PushNotification {
+    public PushNotificacion {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         data = copyOf(data);
@@ -30,8 +30,8 @@ public record PushNotification(
     }
 
     @Override
-    public ChannelType channel() {
-        return ChannelType.PUSH;
+    public TipoCanal channel() {
+        return TipoCanal.PUSH;
     }
 
     public static Builder builder() {
@@ -56,8 +56,8 @@ public record PushNotification(
         public Builder data(String key, String value) { this.data.put(key, value); return this; }
         public Builder metadata(String key, String value) { this.metadata.put(key, value); return this; }
 
-        public PushNotification build() {
-            return new PushNotification(id, null, deviceToken, topic, title, body, data, metadata);
+        public PushNotificacion build() {
+            return new PushNotificacion(id, null, deviceToken, topic, title, body, data, metadata);
         }
     }
 }

@@ -13,14 +13,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Shared helpers for HTTP-based providers. Centralises the HTTP-status -> error semantics so every
- * provider classifies failures the same way (and a new provider gets it for free).
+ *Componentes auxiliares compartidos para proveedores basados ​​en HTTP.
+ * Centralizan la semántica de correspondencia entre estados HTTP y errores,
+  de modo que todos los proveedores clasifiquen los fallos de la misma manera
+ (y cualquier proveedor nuevo obtenga esta funcionalidad automáticamente).
  */
 public final class ProviderSupport {
     private ProviderSupport() {
     }
 
-    /** Executes the request and converts any non-2xx outcome into a classified {@link SendException}. */
+    /** Ejecuta la solicitud y convierte cualquier resultado que no sea 2xx en una {@link SendException} clasificada. */
+
     public static TransportResponse execute(String provider, Transport transport, TransportRequest request)
             throws SendException {
         TransportResponse response;
@@ -50,14 +53,12 @@ public final class ProviderSupport {
         return "Basic " + Base64.getEncoder().encodeToString(raw.getBytes(StandardCharsets.UTF_8));
     }
 
-    /** Extracts a top-level-ish string field from a JSON body. Enough for ids; use a real parser for more. */
-    public static String jsonString(String json, String key) {
+    /** Extrae un campo de tipo cadena situado en un nivel superior (o casi) de un cuerpo JSON. Es suficiente para identificadores; para otros casos, utiliza un analizador (parser) adecuado. */    public static String jsonString(String json, String key) {
         Matcher m = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"").matcher(json);
         return m.find() ? m.group(1) : null;
     }
 
-    /** True if the JSON body contains {@code "key": true}. Needed for Slack, which answers HTTP 200 with ok:false on errors. */
-    public static boolean jsonTrue(String json, String key) {
+    /** Es verdadero si el cuerpo JSON contiene {@code "key": true}. Necesario para Slack, que responde con un código HTTP 200 y {@code ok:false} en caso de error. */    public static boolean jsonTrue(String json, String key) {
         return Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*true").matcher(json).find();
     }
 

@@ -3,13 +3,13 @@ package com.example.notifications;
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.SendException;
 
-/** Decides whether a failed provider should hand over to the next one registered for the channel. */
+/** Determina si un proveedor que ha fallado debe ceder el paso al siguiente proveedor registrado para el canal. */
 public enum FailoverPolicy {
-    /** Any failure moves on to the next provider. Maximises delivery. Default. */
+    /** Ante cualquier fallo, se pasa al siguiente proveedor. Maximiza la entrega. Opción predeterminada. */
     ALWAYS,
-    /** Do not move on when the provider rejected the content itself (HTTP 4xx): another provider will likely reject it too. */
+    /** No continúes si el proveedor ha rechazado el propio contenido (HTTP 4xx): es probable que otro proveedor también lo rechace. */
     SKIP_ON_REJECTION,
-    /** Only the primary provider is ever used. */
+    /** Solo se utiliza el proveedor principal. */
     NEVER;
 
     boolean allows(SendException failure) {

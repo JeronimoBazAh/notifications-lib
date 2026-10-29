@@ -1,10 +1,10 @@
 package com.example.notifications.spi;
 
 /**
- * What a provider says after accepting a notification.
+ * Lo que indica un proveedor tras aceptar una notificación.
  *
- * @param messageId provider-side identifier (SendGrid X-Message-Id, Twilio SID, FCM message name...)
- * @param status    provider-side status, e.g. "queued"
+ * @param messageId identificador en el lado del proveedor (SendGrid X-Message-Id, Twilio SID, nombre de mensaje de FCM, etc.)
+ * @param status    estado en el lado del proveedor; por ejemplo, "en cola" ("queued")
  */
 public record ProviderResponse(String messageId, String status) {
 }

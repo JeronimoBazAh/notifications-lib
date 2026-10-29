@@ -1,7 +1,7 @@
 package com.example.notifications.provider;
 
 import com.example.notifications.Secret;
-import com.example.notifications.model.EmailNotification;
+import com.example.notifications.model.EmailNotificacion;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.Transport;
 import com.example.notifications.spi.TransportRequest;
@@ -13,11 +13,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SendGridEmailProviderTest extends ProviderContractTest<EmailNotification> {
-    @Override NotificationProvider<EmailNotification> provider(Transport t) { return new SendGridEmailProvider(Secret.of("SG.k"), t); }
+class SendGridEmailProviderTest extends ProviderContractTest<EmailNotificacion> {
+    @Override NotificationProvider<EmailNotificacion> provider(Transport t) { return new SendGridEmailProvider(Secret.of("SG.k"), t); }
     @Override Transport happyTransport() { return SimulatedTransports.sendGrid(); }
-    @Override EmailNotification sample() {
-        return EmailNotification.builder().from("a@b.com").to("c@d.com").cc("e@f.com").subject("Hi").textBody("t").htmlBody("<b>h</b>").build();
+    @Override
+    EmailNotificacion sample() {
+        return EmailNotificacion.builder().from("a@b.com").to("c@d.com").cc("e@f.com").subject("Hi").textBody("t").htmlBody("<b>h</b>").build();
     }
 
     @Test void buildsRequestLikeSendGridExpects() throws Exception {

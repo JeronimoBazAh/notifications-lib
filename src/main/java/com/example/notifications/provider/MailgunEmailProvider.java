@@ -2,8 +2,8 @@ package com.example.notifications.provider;
 
 import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.ChannelType;
-import com.example.notifications.model.EmailNotification;
+import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.EmailNotificacion;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Mailgun Messages API: {@code POST /v3/{domain}/messages}, HTTP Basic auth ({@code api:KEY}),
- * form-encoded body (repeated {@code to} fields). Success is {@code 200} with JSON
+ * API de mensajes de Mailgun: {@code POST /v3/{domain}/messages}, autenticación básica HTTP ({@code api:KEY}),
+ * cuerpo codificado mediante formulario (campos {@code to} repetidos). El éxito se indica con un código {@code 200} y un JSON
  * {@code {"id":"<...>","message":"Queued. Thank you."}}.
  */
-public final class MailgunEmailProvider implements NotificationProvider<EmailNotification> {
+public final class MailgunEmailProvider implements NotificationProvider<EmailNotificacion> {
     public static final String NAME = "mailgun";
 
     private final Secret apiKey;
@@ -36,11 +36,11 @@ public final class MailgunEmailProvider implements NotificationProvider<EmailNot
     }
 
     @Override public String name() { return NAME; }
-    @Override public ChannelType channel() { return ChannelType.EMAIL; }
-    @Override public Class<EmailNotification> notificationType() { return EmailNotification.class; }
+    @Override public TipoCanal channel() { return TipoCanal.EMAIL; }
+    @Override public Class<EmailNotificacion> notificationType() { return EmailNotificacion.class; }
 
     @Override
-    public ProviderResponse send(EmailNotification n) throws SendException {
+    public ProviderResponse send(EmailNotificacion n) throws SendException {
         FormBody form = new FormBody().add("from", n.from()).add("subject", n.subject());
         n.to().forEach(a -> form.add("to", a));
         n.cc().forEach(a -> form.add("cc", a));

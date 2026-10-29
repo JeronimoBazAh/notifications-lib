@@ -4,16 +4,16 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Identifies a delivery channel. Deliberately a record and NOT an enum: an enum is closed, so adding
- * a channel (Slack, WhatsApp...) would force editing library code. With a record anyone can define one.
+ * Identifica un canal de entrega. Se ha definido deliberadamente como un `record` y NO como un `enum`: un `enum` es cerrado, por lo que añadir
+ * un canal (Slack, WhatsApp...) obligaría a modificar el código de la biblioteca. Con un `record`, cualquiera puede definir uno nuevo.
  */
-public record ChannelType(String name) {
-    public static final ChannelType EMAIL = new ChannelType("EMAIL");
-    public static final ChannelType SMS = new ChannelType("SMS");
-    public static final ChannelType PUSH = new ChannelType("PUSH");
-    public static final ChannelType SLACK = new ChannelType("SLACK");
+public record TipoCanal(String name) {
+    public static final TipoCanal EMAIL = new TipoCanal("EMAIL");
+    public static final TipoCanal SMS = new TipoCanal("SMS");
+    public static final TipoCanal PUSH = new TipoCanal("PUSH");
+    public static final TipoCanal SLACK = new TipoCanal("SLACK");
 
-    public ChannelType {
+    public TipoCanal {
         Objects.requireNonNull(name, "name");
         if (name.isBlank()) {
             throw new IllegalArgumentException("Channel name must not be blank");
@@ -21,8 +21,8 @@ public record ChannelType(String name) {
         name = name.trim().toUpperCase(Locale.ROOT);
     }
 
-    public static ChannelType of(String name) {
-        return new ChannelType(name);
+    public static TipoCanal of(String name) {
+        return new TipoCanal(name);
     }
 
     @Override

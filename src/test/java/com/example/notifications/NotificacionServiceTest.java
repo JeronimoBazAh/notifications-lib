@@ -4,7 +4,7 @@ import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.NotificationException;
 import com.example.notifications.error.SendException;
 import com.example.notifications.event.EventoNotificacion;
-import com.example.notifications.model.EmailNotification;
+import com.example.notifications.model.EmailNotificacion;
 import com.example.notifications.support.ScriptedProvider;
 import org.junit.jupiter.api.Test;
 
@@ -14,13 +14,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NotificationServiceTest {
+class NotificacionServiceTest {
     // Thread-safe: sendAll() runs deliveries concurrently.
     private final List<Duration> sleeps = new CopyOnWriteArrayList<>();
     private final List<EventoNotificacion> events = new CopyOnWriteArrayList<>();
 
-    private static EmailNotification email() {
-        return EmailNotification.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t").build();
+    private static EmailNotificacion email() {
+        return EmailNotificacion.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t").build();
     }
 
     private static SendException retryable() {
@@ -148,7 +148,7 @@ class NotificationServiceTest {
 
     @Test
     void eventsCarryNotificationMetadataForCorrelation() {
-        EmailNotification n = EmailNotification.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t")
+        EmailNotificacion n = EmailNotificacion.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t")
                 .metadata("tenant", "acme").build();
         base().provider(new ScriptedProvider("p")).build().send(n);
         assertEquals("acme", events.get(0).metadata().get("tenant"));
@@ -158,10 +158,10 @@ class NotificationServiceTest {
     void sendAllKeepsOrderAndIsolatesFailures() {
         ScriptedProvider p = new ScriptedProvider("p", fatal()); // first call fails, the rest succeed
         try (NotificationService s = base().provider(p).build()) {
-            List<EmailNotification> batch = List.of(email(), email(), email());
+            List<EmailNotificacion> batch = List.of(email(), email(), email());
             List<SendResult> results = s.sendAll(batch).join();
             assertEquals(3, results.size());
-            assertEquals(batch.stream().map(EmailNotification::id).toList(),
+            assertEquals(batch.stream().map(EmailNotificacion::id).toList(),
                     results.stream().map(SendResult::notificationId).toList());
             assertEquals(2, results.stream().filter(SendResult::isSuccess).count());
         }

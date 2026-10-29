@@ -11,12 +11,12 @@ import static com.example.notifications.model.Validation.copyOf;
 import static com.example.notifications.model.Validation.hasText;
 import static com.example.notifications.model.Validation.isEmail;
 
-/** Email message. Validated on construction: an invalid instance cannot exist. */
-public record EmailNotification(
+/** Mensaje de correo electrónico. Validado en el momento de su creación: no puede existir una instancia no válida. */
+public record EmailNotificacion(
         String id, Instant createdAt, String from, List<String> to, List<String> cc, List<String> bcc,
-        String subject, String textBody, String htmlBody, Map<String, String> metadata) implements Notification {
+        String subject, String textBody, String htmlBody, Map<String, String> metadata) implements Notificacion {
 
-    public EmailNotification {
+    public EmailNotificacion {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         to = copyOf(to);
@@ -36,15 +36,15 @@ public record EmailNotification(
     }
 
     @Override
-    public ChannelType channel() {
-        return ChannelType.EMAIL;
+    public TipoCanal channel() {
+        return TipoCanal.EMAIL;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    /** PII-safe: recipients and body never end up in logs by accident. */
+    /** Seguro respecto a la PII: los destinatarios y el cuerpo del mensaje nunca terminan en los registros de forma accidental. */
     @Override
     public String toString() {
         return "EmailNotification[id=" + id + ", recipients=" + (to.size() + cc.size() + bcc.size()) + "]";
@@ -65,9 +65,9 @@ public record EmailNotification(
         public Builder htmlBody(String htmlBody) { this.htmlBody = htmlBody; return this; }
         public Builder metadata(String key, String value) { this.metadata.put(key, value); return this; }
 
-        /** @throws com.example.notifications.error.ValidationException listing every violation */
-        public EmailNotification build() {
-            return new EmailNotification(id, null, from, to, cc, bcc, subject, textBody, htmlBody, metadata);
+        /** @throws com.example.notifications.error.ValidationException enumerando todas las infracciones */
+        public EmailNotificacion build() {
+            return new EmailNotificacion(id, null, from, to, cc, bcc, subject, textBody, htmlBody, metadata);
         }
     }
 }

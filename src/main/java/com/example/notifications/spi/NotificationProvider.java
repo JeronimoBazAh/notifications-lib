@@ -1,25 +1,27 @@
 package com.example.notifications.spi;
 
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.ChannelType;
-import com.example.notifications.model.Notification;
+import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.Notificacion;
 
 /**
- * Service Provider Interface: the ONLY thing a new provider (or a whole new channel) must implement.
+ * Interfaz del proveedor de servicios: lo ÚNICO que un nuevo proveedor (o un canal completamente nuevo) debe implementar.
  * <p>
- * Contract: on success return a {@link ProviderResponse}; on any failure throw {@link SendException},
- * stating whether it is retryable. Implementations must be thread-safe.
+ * Contrato: en caso de éxito, devuelve un {@link ProviderResponse}; ante cualquier fallo, lanza una {@link SendException},
+ * indicando si es posible realizar un reintento. Las implementaciones deben ser seguras para su uso en entornos multihilo (thread-safe).
  *
- * @param <N> the notification type this provider can deliver
- */
-public interface NotificationProvider<N extends Notification> {
+ * @param <N> el tipo de notificación que este proveedor puede entregar
 
-    /** Stable, human-readable name used in results, events and logs (e.g. "sendgrid"). */
+
+ */
+public interface NotificationProvider<N extends Notificacion> {
+
+    /** Nombre estable y legible por humanos, utilizado en resultados, eventos y registros (p. ej., "sendgrid"). */
     String name();
 
-    ChannelType channel();
+    TipoCanal channel();
 
-    /** Lets the service dispatch type-safely without unchecked casts. */
+    /** Permite al servicio realizar el envío de forma tipocura, sin necesidad de conversiones de tipo no verificadas. */
     Class<N> notificationType();
 
     ProviderResponse send(N notification) throws SendException;

@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Fake transports that log the outgoing request (headers/credentials are NOT logged) and answer
- * exactly like the real API does on success. This is how the demo "sends" without touching the network.
+ * Transportes simulados que registran la solicitud saliente (los encabezados y las credenciales NO se registran) y responden
+ * exactamente igual que la API real en caso de éxito. Así es como la demostración «envía» datos sin interactuar con la red.
+ *
  */
+
+
 public final class SimulatedTransports {
     private static final System.Logger LOG = System.getLogger("notifications.simulated");
 

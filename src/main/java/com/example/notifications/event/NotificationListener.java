@@ -1,10 +1,9 @@
 package com.example.notifications.event;
 
 /**
- * Subscribe to notification lifecycle events (metrics, audit, DLQ...).
- * Listener exceptions are caught and logged: a faulty listener never breaks delivery.
+ Las excepciones en los *listeners* se capturan y registran: un *listener* con errores nunca interrumpe la entrega.
  */
 @FunctionalInterface
 public interface NotificationListener {
-    void onEvent(NotificationEvent event);
+    void onEvent(EventoNotificacion event);
 }

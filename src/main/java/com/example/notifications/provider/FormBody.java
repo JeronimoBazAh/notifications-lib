@@ -5,8 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Builds an {@code application/x-www-form-urlencoded} body. Keys may repeat (Mailgun's multiple 'to'). */
-public final class FormBody {
+/** Construye un cuerpo de tipo {@code application/x-www-form-urlencoded}. Las claves pueden repetirse (como en el caso de los múltiples destinatarios «to» de Mailgun). */public final class FormBody {
     private final List<String> pairs = new ArrayList<>();
 
     public FormBody add(String key, String value) {

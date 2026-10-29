@@ -4,11 +4,10 @@ import java.time.Duration;
 import java.util.Objects;
 
 /**
- * Exponential backoff applied PER PROVIDER and only to retryable failures.
+ * Retroceso exponencial aplicado POR PROVEEDOR y solo ante fallos que admiten reintento.
  *
- * @param maxAttempts total attempts including the first one (1 = no retries)
- * @param jitter      0..1. Each delay is reduced by up to this fraction at random, so many clients that failed
- *                    together don't all retry at the same instant (thundering herd). 0 = deterministic.
+ * @param maxAttempts número total de intentos, incluyendo el primero (1 = sin reintentos)
+ * @param jitter      valor entre 0 y 1. Cada espera se reduce aleatoriamente hasta en esta proporción, de modo que, si varios clientes fallan simultáneamente, no todos realicen el reintento en el mismo instante (evitando el efecto «estampida» o *thundering herd*). 0 = determinista.
  */
 public record RetryPolicy(int maxAttempts, Duration initialDelay, double multiplier, Duration maxDelay, double jitter) {
 
@@ -22,8 +21,7 @@ public record RetryPolicy(int maxAttempts, Duration initialDelay, double multipl
         if (jitter < 0 || jitter > 1) throw new IllegalArgumentException("jitter must be between 0 and 1");
     }
 
-    /** Deterministic policy (no jitter). */
-    public RetryPolicy(int maxAttempts, Duration initialDelay, double multiplier, Duration maxDelay) {
+    /** Política determinista (sin fluctuaciones). */    public RetryPolicy(int maxAttempts, Duration initialDelay, double multiplier, Duration maxDelay) {
         this(maxAttempts, initialDelay, multiplier, maxDelay, 0.0);
     }
 
@@ -31,7 +29,7 @@ public record RetryPolicy(int maxAttempts, Duration initialDelay, double multipl
         return new RetryPolicy(1, Duration.ZERO, 1, Duration.ZERO, 0.0);
     }
 
-    /** Doubles the delay on each failure, capped at 30 seconds (or the initial delay if larger). */
+    /** Duplica el retardo ante cada fallo, con un límite de 30 segundos (o el retardo inicial, si este fuera mayor). */
     public static RetryPolicy exponential(int maxAttempts, Duration initialDelay) {
         Duration cap = initialDelay.compareTo(Duration.ofSeconds(30)) > 0 ? initialDelay : Duration.ofSeconds(30);
         return new RetryPolicy(maxAttempts, initialDelay, 2.0, cap, 0.0);
@@ -41,13 +39,13 @@ public record RetryPolicy(int maxAttempts, Duration initialDelay, double multipl
         return new RetryPolicy(maxAttempts, initialDelay, multiplier, maxDelay, jitter);
     }
 
-    /** Base delay after the given failed attempt (1-based), without jitter. */
+    /** Retraso base tras el intento fallido indicado (numerado a partir de 1), sin fluctuación (jitter). */
     public Duration delayAfter(int failedAttempt) {
         Duration d = Duration.ofMillis((long) (initialDelay.toMillis() * Math.pow(multiplier, failedAttempt - 1)));
         return d.compareTo(maxDelay) > 0 ? maxDelay : d;
     }
 
-    /** Delay with jitter applied. {@code randomUnit} must be in [0, 1) (inject it to keep tests deterministic). */
+    /** Retraso con *jitter* aplicado. {@code randomUnit} debe estar en el intervalo [0, 1) (inyéctalo para mantener la determinista de las pruebas). */
     public Duration delayAfter(int failedAttempt, double randomUnit) {
         Duration base = delayAfter(failedAttempt);
         return Duration.ofMillis((long) (base.toMillis() * (1 - jitter * randomUnit)));

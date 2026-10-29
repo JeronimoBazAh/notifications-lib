@@ -2,8 +2,8 @@ package com.example.notifications.provider;
 
 import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.ChannelType;
-import com.example.notifications.model.SmsNotification;
+import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.SmsNotificacion;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -15,10 +15,12 @@ import java.util.Objects;
 
 /**
  * Twilio Programmable Messaging: {@code POST /2010-04-01/Accounts/{AccountSid}/Messages.json},
- * Basic auth ({@code AccountSid:AuthToken}), form fields {@code To}, {@code From}, {@code Body}.
- * Success is {@code 201 Created} with JSON containing {@code sid} and {@code status} ("queued").
+ * Autenticación básica ({@code AccountSid:AuthToken}), campos de formulario {@code To}, {@code From}, {@code Body}.
+ * El éxito se indica mediante {@code 201 Created}, con un JSON que contiene {@code sid} y {@code status} ("queued").
+
+
  */
-public final class TwilioSmsProvider implements NotificationProvider<SmsNotification> {
+public final class TwilioSmsProvider implements NotificationProvider<SmsNotificacion> {
     public static final String NAME = "twilio";
 
     private final String accountSid;
@@ -26,8 +28,7 @@ public final class TwilioSmsProvider implements NotificationProvider<SmsNotifica
     private final String defaultFrom;
     private final Transport transport;
 
-    /** @param defaultFrom sender used when the notification does not specify one */
-    public TwilioSmsProvider(String accountSid, Secret authToken, String defaultFrom, Transport transport) {
+    /** @param defaultFrom remitente que se utiliza cuando la notificación no especifica ninguno */    public TwilioSmsProvider(String accountSid, Secret authToken, String defaultFrom, Transport transport) {
         this.accountSid = Objects.requireNonNull(accountSid, "accountSid");
         this.authToken = Objects.requireNonNull(authToken, "authToken");
         this.defaultFrom = Objects.requireNonNull(defaultFrom, "defaultFrom");
@@ -39,11 +40,11 @@ public final class TwilioSmsProvider implements NotificationProvider<SmsNotifica
     }
 
     @Override public String name() { return NAME; }
-    @Override public ChannelType channel() { return ChannelType.SMS; }
-    @Override public Class<SmsNotification> notificationType() { return SmsNotification.class; }
+    @Override public TipoCanal channel() { return TipoCanal.SMS; }
+    @Override public Class<SmsNotificacion> notificationType() { return SmsNotificacion.class; }
 
     @Override
-    public ProviderResponse send(SmsNotification n) throws SendException {
+    public ProviderResponse send(SmsNotificacion n) throws SendException {
         String body = new FormBody()
                 .add("To", n.to())
                 .add("From", n.from() != null ? n.from() : defaultFrom)

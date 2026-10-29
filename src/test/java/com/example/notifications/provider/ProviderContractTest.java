@@ -2,7 +2,7 @@ package com.example.notifications.provider;
 
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.Notification;
+import com.example.notifications.model.Notificacion;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -15,7 +15,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Contract every provider must satisfy. A new provider = one subclass of this. */
-abstract class ProviderContractTest<N extends Notification> {
+abstract class ProviderContractTest<N extends Notificacion> {
     abstract NotificationProvider<N> provider(Transport transport);
     abstract Transport happyTransport();
     abstract N sample();

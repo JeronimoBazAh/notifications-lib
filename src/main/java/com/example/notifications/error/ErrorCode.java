@@ -1,19 +1,19 @@
 package com.example.notifications.error;
 
-/** Machine-readable reason of a failure. Lets callers branch without parsing messages. */
+/** Motivo de un fallo, en un formato legible por máquina. Permite a quien realiza la llamada tomar distintas rutas sin necesidad de analizar mensajes. */
 public enum ErrorCode {
-    /** The notification itself is malformed (never reaches a provider). */
+    /** La notificación en sí está mal formada (nunca llega a un proveedor). */
     VALIDATION,
-    /** No provider is registered for the notification's channel. */
+    /** No hay ningún proveedor registrado para el canal de la notificación. */
     NO_PROVIDER,
-    /** Provider rejected our credentials (HTTP 401/403). Not retryable. */
+    /** El proveedor rechazó nuestras credenciales (HTTP 401/403). No admite reintento. */
     AUTHENTICATION,
-    /** Provider throttled us (HTTP 429). Retryable. */
+    /** El proveedor nos ha limitado (HTTP 429). Reintentable. */
     RATE_LIMITED,
-    /** Provider refused the request content (HTTP 4xx). Not retryable. */
+    /** El proveedor rechazó el contenido de la solicitud (HTTP 4xx). No admite reintento. */
     REJECTED_BY_PROVIDER,
-    /** Provider down or network failure (HTTP 5xx / IO). Retryable. */
+    /** Proveedor caído o fallo de red (HTTP 5xx / IO). Reintentable. */
     PROVIDER_UNAVAILABLE,
-    /** Anything we did not anticipate (bug in a provider, interruption...). */
+    /** Cualquier cosa que no hayamos previsto (un error en un proveedor, una interrupción...). */
     UNEXPECTED
 }
