@@ -3,7 +3,7 @@ package com.example.notifications;
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.NotificationException;
 import com.example.notifications.error.SendException;
-import com.example.notifications.event.NotificationEvent;
+import com.example.notifications.event.EventoNotificacion;
 import com.example.notifications.model.EmailNotification;
 import com.example.notifications.support.ScriptedProvider;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class NotificationServiceTest {
     // Thread-safe: sendAll() runs deliveries concurrently.
     private final List<Duration> sleeps = new CopyOnWriteArrayList<>();
-    private final List<NotificationEvent> events = new CopyOnWriteArrayList<>();
+    private final List<EventoNotificacion> events = new CopyOnWriteArrayList<>();
 
     private static EmailNotification email() {
         return EmailNotification.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t").build();
@@ -75,8 +75,8 @@ class NotificationServiceTest {
         assertTrue(r.isSuccess());
         assertEquals("backup", r.provider());
         assertEquals(
-                List.of(NotificationEvent.Type.ATTEMPT_FAILED, NotificationEvent.Type.FAILOVER, NotificationEvent.Type.SENT),
-                events.stream().map(NotificationEvent::type).toList());
+                List.of(EventoNotificacion.Type.ATTEMPT_FAILED, EventoNotificacion.Type.FAILOVER, EventoNotificacion.Type.SENT),
+                events.stream().map(EventoNotificacion::type).toList());
     }
 
     @Test
@@ -113,7 +113,7 @@ class NotificationServiceTest {
                 .build().send(email());
         assertFalse(r.isSuccess());
         assertEquals(2, r.attempts());
-        assertEquals(NotificationEvent.Type.FAILED, events.get(events.size() - 1).type());
+        assertEquals(EventoNotificacion.Type.FAILED, events.get(events.size() - 1).type());
         assertThrows(NotificationException.class, r::orElseThrow);
     }
 
