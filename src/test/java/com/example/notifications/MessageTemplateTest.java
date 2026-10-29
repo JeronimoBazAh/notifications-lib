@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MessageTemplateTest {
     @Test
     void rendersVariablesIgnoringWhitespaceInsideBraces() {
-        assertEquals("Hi Ana, code 42", MessageTemplate.of("Hi {{ name }}, code {{code}}").render(Map.of("name", "Ana", "code", "42")));
+        assertEquals("Hola Ana, code 42", MessageTemplate.of("Hola {{ name }}, code {{code}}").render(Map.of("name", "Ana", "code", "42")));
     }
 
     @Test
@@ -37,6 +37,6 @@ class MessageTemplateTest {
 
     @Test
     void valuesWithRegexSpecialCharactersAreInsertedLiterally() {
-        assertEquals("cost $1 \\ done", MessageTemplate.of("cost {{x}} done").render(Map.of("x", "$1 \\")));
+        assertEquals("costo $1 \\ done", MessageTemplate.of("costo {{x}} done").render(Map.of("x", "$1 \\")));
     }
 }

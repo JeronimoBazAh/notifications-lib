@@ -1,5 +1,7 @@
 # notifications-lib
 
+![CI](https://github.com/JeronimoBazAh/notifications-lib/actions/workflows/ci.yml/badge.svg)
+
 Librería Java 21 para enviar notificaciones (Email, SMS, Push, Slack) con **una única API**, agnóstica a
 frameworks y **sin dependencias en runtime**. Cambiar de proveedor es cambiar una línea de configuración.
 
@@ -111,7 +113,7 @@ Por defecto el demo envía a través de `SimulatedTransports`; `JdkHttpTransport
 ## API principal
 
 - `NotificationService`: `send(n)`, `sendAsync(n)`, `sendAll(list)`, `close()`
-- `SendResult`: `isSuccess()`, `provider()`, `providerMessageId()`, `attempts()`, `error()`, `orElseThrow()`
+- `SendResult` (sealed: `Sent` | `Failed`): `isSuccess()`, `provider()`, `providerMessageId()`, `attempts()`, `error()`, `orElseThrow()`. Admite `switch` exhaustivo.
 - `MessageTemplate`: `render(vars)` / `renderHtml(vars)` (escapa HTML), con `{{variable}}`
 - Errores: `ValidationException`, `SendException`, `ErrorCode`
 
@@ -163,7 +165,7 @@ Después, crea una subclase de `ProviderContractTest`: todo proveedor nuevo debe
 - **`Secret`** oculta el valor en `toString()` y logs. Solo `reveal()` lo expone, al armar el header.
 - No pongas claves en el código: usa variables de entorno (`Secret.fromEnv`) o un secret manager.
 - Los `toString()` de las notificaciones no incluyen destinatarios ni contenido (PII fuera de los logs).
-- Los transportes simulados nunca loguean headers (donde viajan las credenciales).
+- Los transportes simulados solo loguean método y URL: ni headers (credenciales) ni cuerpo (datos personales).
 - `MessageTemplate.renderHtml` escapa los valores para evitar inyección de HTML.
 - `JdkHttpTransport` aplica timeouts de conexión y de request.
 
@@ -185,7 +187,7 @@ Después, crea una subclase de `ProviderContractTest`: todo proveedor nuevo debe
 
 ## Tests
 
-`mvn clean test` (90 tests). Incluye:
+`mvn clean test` (96 tests). Incluye:
 
 - Servicio: retry/backoff, failover, políticas, eventos, listeners con error, interrupción, async y batch.
 - **Contract test** (`ProviderContractTest`): lo pasan los 5 proveedores (éxito + 401/429/503/400 + error de red).
@@ -201,6 +203,7 @@ Después, crea una subclase de `ProviderContractTest`: todo proveedor nuevo debe
 - Adjuntos de email y payloads específicos de plataforma en push (APNs/Android).
 - Parseo de respuestas con Jackson y métricas (Micrometer) sobre `NotificationListener`.
 - Persistencia / outbox para garantizar entrega ante caídas del proceso.
+- Límite de concurrencia en `sendAll`: hoy lanza un hilo virtual por notificación; falta un `Semaphore` configurable.
 
 ## Uso de IA
 
@@ -212,7 +215,7 @@ Esta solución se desarrolló con **Claude (Anthropic)** como asistente.
   los tests y este README.
 - **Proceso**: analizamos primero el enunciado, definimos la arquitectura y luego iteramos con una revisión crítica
   (SRP del servicio, tests con hilos, failover configurable, jitter, transporte real).
-- **Verificación**: los 90 tests se ejecutaron con el lanzador de JUnit sobre JDK 21. La construcción con Maven
+- **Verificación**: los 96 tests se ejecutaron con el lanzador de JUnit sobre JDK 21. La construcción con Maven
   (`mvn clean test`) la verifico yo localmente.
 
 <!-- Ajusta esta sección a lo que realmente hiciste. -->
