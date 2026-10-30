@@ -6,22 +6,22 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SeguridadAndRetryTest {
+class SecretAndRetryTest {
     @Test
     void secretNeverLeaksInToString() {
-        Seguridad s = Seguridad.of("super-secret");
+        Secret s = Secret.of("super-secret");
         assertFalse(s.toString().contains("super-secret"));
         assertEquals("super-secret", s.reveal());
     }
 
     @Test
     void blankSecretIsRejected() {
-        assertThrows(IllegalArgumentException.class, () -> Seguridad.of(" "));
+        assertThrows(IllegalArgumentException.class, () -> Secret.of(" "));
     }
 
     @Test
     void missingEnvironmentVariableFailsFast() {
-        assertThrows(IllegalStateException.class, () -> Seguridad.fromEnv("DEFINITELY_NOT_SET_VAR_12345"));
+        assertThrows(IllegalStateException.class, () -> Secret.fromEnv("DEFINITELY_NOT_SET_VAR_12345"));
     }
 
     @Test

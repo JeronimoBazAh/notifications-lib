@@ -16,18 +16,18 @@ import java.util.regex.Pattern;
 
 
  */
-public final class MensajeTemplate {
+public final class MessageTemplate {
     private static final Pattern VARIABLE = Pattern.compile("\\{\\{\\s*([A-Za-z0-9_.]+)\\s*}}");
 
     private final String source;
 
-    private MensajeTemplate(String source) {
+    private MessageTemplate(String source) {
         this.source = source;
     }
 
-    public static MensajeTemplate of(String source) {
+    public static MessageTemplate of(String source) {
         Objects.requireNonNull(source, "source");
-        return new MensajeTemplate(source);
+        return new MessageTemplate(source);
     }
 
     public Set<String> variables() {

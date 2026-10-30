@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
 import com.example.notifications.model.ChanelType;
 import com.example.notifications.model.EmailNotification;
@@ -21,17 +21,17 @@ import java.util.Objects;
 public final class MailgunEmailProvider implements NotificationProvider<EmailNotification> {
     public static final String NAME = "mailgun";
 
-    private final Seguridad apiKey;
+    private final Secret apiKey;
     private final String domain;
     private final Transport transport;
 
-    public MailgunEmailProvider(Seguridad apiKey, String domain, Transport transport) {
+    public MailgunEmailProvider(Secret apiKey, String domain, Transport transport) {
         this.apiKey = Objects.requireNonNull(apiKey, "apiKey");
         this.domain = Objects.requireNonNull(domain, "domain");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
-    public static MailgunEmailProvider simulated(Seguridad apiKey, String domain) {
+    public static MailgunEmailProvider simulated(Secret apiKey, String domain) {
         return new MailgunEmailProvider(apiKey, domain, SimulatedTransports.mailgun(domain));
     }
 

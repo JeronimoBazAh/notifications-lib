@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.model.SmsNotification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.Transport;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TwilioSmsProviderTest extends ProviderContractTest<SmsNotification> {
-    @Override NotificationProvider<SmsNotification> provider(Transport t) { return new TwilioSmsProvider("ACx", Seguridad.of("tok"), "+15005550006", t); }
+    @Override NotificationProvider<SmsNotification> provider(Transport t) { return new TwilioSmsProvider("ACx", Secret.of("tok"), "+15005550006", t); }
     @Override Transport happyTransport() { return SimulatedTransports.twilio(); }
     @Override
     SmsNotification sample() { return SmsNotification.builder().to("+5493515551234").body("hi").build(); }

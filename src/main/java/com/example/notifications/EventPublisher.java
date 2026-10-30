@@ -2,19 +2,19 @@ package com.example.notifications;
 
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.event.NotificationEvent;
-import com.example.notifications.event.NotificacionListener;
+import com.example.notifications.event.NotificationListener;
 import com.example.notifications.model.Notification;
 
 import java.time.Instant;
 import java.util.List;
 
 /** Propaga los eventos del ciclo de vida a los oyentes. Si un oyente falla, se registra el error y se aísla dicho oyente. */
-final class PublicadorEventos {
-    private static final System.Logger LOG = System.getLogger(PublicadorEventos.class.getName());
+final class EventPublisher {
+    private static final System.Logger LOG = System.getLogger(EventPublisher.class.getName());
 
-    private final List<NotificacionListener> listeners;
+    private final List<NotificationListener> listeners;
 
-    PublicadorEventos(List<NotificacionListener> listeners) {
+    EventPublisher(List<NotificationListener> listeners) {
         this.listeners = List.copyOf(listeners);
     }
 
@@ -24,7 +24,7 @@ final class PublicadorEventos {
         }
         NotificationEvent event = new NotificationEvent(
                 type, n.id(), n.channel(), provider, attempt, code, detail, n.metadata(), Instant.now());
-        for (NotificacionListener listener : listeners) {
+        for (NotificationListener listener : listeners) {
             try {
                 listener.onEvent(event);
             } catch (RuntimeException e) {

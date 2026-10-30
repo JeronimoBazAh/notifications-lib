@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.model.EmailNotification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.Transport;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SendGridEmailProviderTest extends ProviderContractTest<EmailNotification> {
-    @Override NotificationProvider<EmailNotification> provider(Transport t) { return new SendGridEmailProvider(Seguridad.of("SG.k"), t); }
+    @Override NotificationProvider<EmailNotification> provider(Transport t) { return new SendGridEmailProvider(Secret.of("SG.k"), t); }
     @Override Transport happyTransport() { return SimulatedTransports.sendGrid(); }
     @Override
     EmailNotification sample() {

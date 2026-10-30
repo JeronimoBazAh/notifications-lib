@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
 import com.example.notifications.model.ChanelType;
 import com.example.notifications.model.PushNotification;
@@ -27,16 +27,16 @@ public final class FcmPushProvider implements NotificationProvider<PushNotificat
     public static final String NAME = "fcm";
 
     private final String projectId;
-    private final Supplier<Seguridad> accessToken;
+    private final Supplier<Secret> accessToken;
     private final Transport transport;
 
-    public FcmPushProvider(String projectId, Supplier<Seguridad> accessToken, Transport transport) {
+    public FcmPushProvider(String projectId, Supplier<Secret> accessToken, Transport transport) {
         this.projectId = Objects.requireNonNull(projectId, "projectId");
         this.accessToken = Objects.requireNonNull(accessToken, "accessToken");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
-    public static FcmPushProvider simulated(String projectId, Supplier<Seguridad> accessToken) {
+    public static FcmPushProvider simulated(String projectId, Supplier<Secret> accessToken) {
         return new FcmPushProvider(projectId, accessToken, SimulatedTransports.fcm(projectId));
     }
 

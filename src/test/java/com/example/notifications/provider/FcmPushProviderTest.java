@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.model.PushNotification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.Transport;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FcmPushProviderTest extends ProviderContractTest<PushNotification> {
-    @Override NotificationProvider<PushNotification> provider(Transport t) { return new FcmPushProvider("proj", () -> Seguridad.of("ya29"), t); }
+    @Override NotificationProvider<PushNotification> provider(Transport t) { return new FcmPushProvider("proj", () -> Secret.of("ya29"), t); }
     @Override Transport happyTransport() { return SimulatedTransports.fcm("proj"); }
     @Override
     PushNotification sample() { return PushNotification.builder().deviceToken("tok").title("t").body("b").data("k", "v").build(); }
@@ -38,7 +38,7 @@ class FcmPushProviderTest extends ProviderContractTest<PushNotification> {
 
     @Test void accessTokenIsReadOnEveryCallSoRefreshedTokensAreUsed() throws Exception {
         int[] calls = {0};
-        FcmPushProvider p = new FcmPushProvider("proj", () -> Seguridad.of("tok-" + (++calls[0])), happyTransport());
+        FcmPushProvider p = new FcmPushProvider("proj", () -> Secret.of("tok-" + (++calls[0])), happyTransport());
         p.send(sample());
         p.send(sample());
         assertEquals(2, calls[0]);

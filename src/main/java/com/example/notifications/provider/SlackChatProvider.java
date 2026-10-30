@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.SendException;
 import com.example.notifications.model.ChanelType;
@@ -23,15 +23,15 @@ import java.util.Objects;
 public final class SlackChatProvider implements NotificationProvider<SlackNotification> {
     public static final String NAME = "slack";
 
-    private final Seguridad botToken;
+    private final Secret botToken;
     private final Transport transport;
 
-    public SlackChatProvider(Seguridad botToken, Transport transport) {
+    public SlackChatProvider(Secret botToken, Transport transport) {
         this.botToken = Objects.requireNonNull(botToken, "botToken");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
-    public static SlackChatProvider simulated(Seguridad botToken) {
+    public static SlackChatProvider simulated(Secret botToken) {
         return new SlackChatProvider(botToken, SimulatedTransports.slack());
     }
 

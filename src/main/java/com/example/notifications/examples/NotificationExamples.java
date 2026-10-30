@@ -3,7 +3,7 @@ package com.example.notifications.examples;
 import com.example.notifications.FailoverPolicy;
 import com.example.notifications.NotificationService;
 import com.example.notifications.RetryPolicy;
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.SendResult;
 import com.example.notifications.error.ValidationException;
 import com.example.notifications.model.EmailNotification;
@@ -17,7 +17,7 @@ import com.example.notifications.provider.SendGridEmailProvider;
 import com.example.notifications.provider.SlackChatProvider;
 import com.example.notifications.provider.TwilioSmsProvider;
 import com.example.notifications.spi.TransportResponse;
-import com.example.notifications.template.MensajeTemplate;
+import com.example.notifications.template.MessageTemplate;
 
 import java.time.Duration;
 import java.util.List;
@@ -29,21 +29,21 @@ public final class NotificationExamples {
     public static void main(String[] args) {
         // In production read secrets from the environment: Secret.fromEnv("SENDGRID_API_KEY")
         try (NotificationService service = NotificationService.builder()
-                .provider(SendGridEmailProvider.simulated(Seguridad.of("SG.demo")))
-                .provider(MailgunEmailProvider.simulated(Seguridad.of("key-demo"), "mg.example.com"))
-                .provider(TwilioSmsProvider.simulated("ACdemo", Seguridad.of("token-demo"), "+15005550006"))
-                .provider(FcmPushProvider.simulated("demo-project", () -> Seguridad.of("ya29.demo")))
-                .provider(SlackChatProvider.simulated(Seguridad.of("xoxb-demo")))
+                .provider(SendGridEmailProvider.simulated(Secret.of("SG.demo")))
+                .provider(MailgunEmailProvider.simulated(Secret.of("key-demo"), "mg.example.com"))
+                .provider(TwilioSmsProvider.simulated("ACdemo", Secret.of("token-demo"), "+15005550006"))
+                .provider(FcmPushProvider.simulated("demo-project", () -> Secret.of("ya29.demo")))
+                .provider(SlackChatProvider.simulated(Secret.of("xoxb-demo")))
                 .retryPolicy(RetryPolicy.exponential(3, Duration.ofMillis(200)).withJitter(0.2))
                 .listener(e -> System.out.println("  event: " + e.type() + " " + e.channel() + " via " + e.provider()))
                 .build()) {
 
             title("1) Same API for every channel");
-            MensajeTemplate welcome = MensajeTemplate.of("Hi {{name}}, your code is {{code}}");
+            MessageTemplate welcome = MessageTemplate.of("Hi {{name}}, your code is {{code}}");
             Map<String, String> vars = Map.of("name", "Ana", "code", "4821");
             show(service.send(EmailNotification.builder().from("no-reply@acme.com").to("ana@example.com")
                     .subject("Welcome").textBody(welcome.render(vars))
-                    .htmlBody(MensajeTemplate.of("<b>Hi {{name}}</b>").renderHtml(vars)).build()));
+                    .htmlBody(MessageTemplate.of("<b>Hi {{name}}</b>").renderHtml(vars)).build()));
             show(service.send(SmsNotification.builder().to("+5493515551234").body(welcome.render(vars)).build()));
             show(service.send(PushNotification.builder().deviceToken("fcm-token-123").title("Transfer received")
                     .body("You received $100").data("txId", "tx-42").build()));
@@ -58,9 +58,9 @@ public final class NotificationExamples {
 
             title("3) Retry + failover: SendGrid is down (503), Mailgun takes over");
             try (NotificationService resilient = NotificationService.builder()
-                    .provider(new SendGridEmailProvider(Seguridad.of("SG.demo"),
+                    .provider(new SendGridEmailProvider(Secret.of("SG.demo"),
                             request -> new TransportResponse(503, Map.of(), "unavailable")))
-                    .provider(MailgunEmailProvider.simulated(Seguridad.of("key-demo"), "mg.example.com"))
+                    .provider(MailgunEmailProvider.simulated(Secret.of("key-demo"), "mg.example.com"))
                     .retryPolicy(RetryPolicy.exponential(2, Duration.ofMillis(50)))
                     .failoverPolicy(FailoverPolicy.ALWAYS)
                     .listener(e -> System.out.println("  event: " + e.type() + " via " + e.provider()))

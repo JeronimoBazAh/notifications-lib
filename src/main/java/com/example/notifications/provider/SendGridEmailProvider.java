@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
 import com.example.notifications.model.ChanelType;
 import com.example.notifications.model.EmailNotification;
@@ -25,16 +25,16 @@ public final class SendGridEmailProvider implements NotificationProvider<EmailNo
     public static final String NAME = "sendgrid";
     private static final String URL = "https://api.sendgrid.com/v3/mail/send";
 
-    private final Seguridad apiKey;
+    private final Secret apiKey;
     private final Transport transport;
 
-    public SendGridEmailProvider(Seguridad apiKey, Transport transport) {
+    public SendGridEmailProvider(Secret apiKey, Transport transport) {
         this.apiKey = Objects.requireNonNull(apiKey, "apiKey");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
     /** Proveedor conectado a un transporte simulado: registra la solicitud y responde tal como lo haría SendGrid. */
-    public static SendGridEmailProvider simulated(Seguridad apiKey) {
+    public static SendGridEmailProvider simulated(Secret apiKey) {
         return new SendGridEmailProvider(apiKey, SimulatedTransports.sendGrid());
     }
 

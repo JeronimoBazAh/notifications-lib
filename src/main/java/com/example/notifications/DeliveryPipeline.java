@@ -23,10 +23,10 @@ final class DeliveryPipeline {
     private final RetryPolicy retryPolicy;
     private final FailoverPolicy failoverPolicy;
     private final Sleeper sleeper;
-    private final PublicadorEventos events;
+    private final EventPublisher events;
 
     DeliveryPipeline(Map<ChanelType, List<NotificationProvider<?>>> providers, RetryPolicy retryPolicy,
-                     FailoverPolicy failoverPolicy, Sleeper sleeper, PublicadorEventos events) {
+                     FailoverPolicy failoverPolicy, Sleeper sleeper, EventPublisher events) {
         this.providers = providers;
         this.retryPolicy = retryPolicy;
         this.failoverPolicy = failoverPolicy;

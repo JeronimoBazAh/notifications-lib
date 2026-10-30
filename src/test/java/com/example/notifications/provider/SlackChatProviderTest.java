@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.SendException;
 import com.example.notifications.model.SlackNotification;
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SlackChatProviderTest extends ProviderContractTest<SlackNotification> {
-    @Override NotificationProvider<SlackNotification> provider(Transport t) { return new SlackChatProvider(Seguridad.of("xoxb-1"), t); }
+    @Override NotificationProvider<SlackNotification> provider(Transport t) { return new SlackChatProvider(Secret.of("xoxb-1"), t); }
     @Override Transport happyTransport() { return SimulatedTransports.slack(); }
     @Override
     SlackNotification sample() { return SlackNotification.builder().target("#alerts").text("deploy done").build(); }

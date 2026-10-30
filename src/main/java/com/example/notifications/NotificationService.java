@@ -1,6 +1,6 @@
 package com.example.notifications;
 
-import com.example.notifications.event.NotificacionListener;
+import com.example.notifications.event.NotificationListener;
 import com.example.notifications.model.ChanelType;
 import com.example.notifications.model.Notification;
 import com.example.notifications.spi.NotificationProvider;
@@ -32,7 +32,7 @@ public final class NotificationService implements AutoCloseable {
         Map<ChanelType, List<NotificationProvider<?>>> copy = new LinkedHashMap<>();
         b.providers.forEach((channel, list) -> copy.put(channel, List.copyOf(list)));
         this.pipeline = new DeliveryPipeline(Map.copyOf(copy), b.retryPolicy, b.failoverPolicy, b.sleeper,
-                new PublicadorEventos(b.listeners));
+                new EventPublisher(b.listeners));
         if (b.executor != null) {
             this.executor = b.executor;
             this.ownedExecutor = null;
@@ -75,7 +75,7 @@ public final class NotificationService implements AutoCloseable {
 
     public static final class Builder {
         private final Map<ChanelType, List<NotificationProvider<?>>> providers = new LinkedHashMap<>();
-        private final List<NotificacionListener> listeners = new ArrayList<>();
+        private final List<NotificationListener> listeners = new ArrayList<>();
         private RetryPolicy retryPolicy = RetryPolicy.none();
         private FailoverPolicy failoverPolicy = FailoverPolicy.ALWAYS;
         private Executor executor;
@@ -98,7 +98,7 @@ public final class NotificationService implements AutoCloseable {
             return this;
         }
 
-        public Builder listener(NotificacionListener listener) {
+        public Builder listener(NotificationListener listener) {
             this.listeners.add(Objects.requireNonNull(listener, "listener"));
             return this;
         }

@@ -1,6 +1,6 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Seguridad;
+import com.example.notifications.Secret;
 import com.example.notifications.error.SendException;
 import com.example.notifications.model.ChanelType;
 import com.example.notifications.model.SmsNotification;
@@ -24,18 +24,18 @@ public final class TwilioSmsProvider implements NotificationProvider<SmsNotifica
     public static final String NAME = "twilio";
 
     private final String accountSid;
-    private final Seguridad authToken;
+    private final Secret authToken;
     private final String defaultFrom;
     private final Transport transport;
 
-    /** @param defaultFrom remitente que se utiliza cuando la notificación no especifica ninguno */    public TwilioSmsProvider(String accountSid, Seguridad authToken, String defaultFrom, Transport transport) {
+    /** @param defaultFrom remitente que se utiliza cuando la notificación no especifica ninguno */    public TwilioSmsProvider(String accountSid, Secret authToken, String defaultFrom, Transport transport) {
         this.accountSid = Objects.requireNonNull(accountSid, "accountSid");
         this.authToken = Objects.requireNonNull(authToken, "authToken");
         this.defaultFrom = Objects.requireNonNull(defaultFrom, "defaultFrom");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
-    public static TwilioSmsProvider simulated(String accountSid, Seguridad authToken, String defaultFrom) {
+    public static TwilioSmsProvider simulated(String accountSid, Secret authToken, String defaultFrom) {
         return new TwilioSmsProvider(accountSid, authToken, defaultFrom, SimulatedTransports.twilio());
     }
 
