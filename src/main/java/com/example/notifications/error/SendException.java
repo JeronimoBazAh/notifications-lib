@@ -1,7 +1,7 @@
 package com.example.notifications.error;
 
 /**
- * La entrega falló por parte del proveedor (o durante el trayecto hacia él).
+ * La entrega fallo por parte del proveedor (o durante el trayecto hacia él).
  * {@link #isRetryable()} indica al servicio si tiene sentido realizar un nuevo intento.
  */
 public final class SendException extends NotificationException {

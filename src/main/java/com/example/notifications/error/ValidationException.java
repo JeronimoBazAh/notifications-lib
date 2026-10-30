@@ -2,7 +2,7 @@ package com.example.notifications.error;
 
 import java.util.List;
 
-/** La notificación no es válida. Incluye TODAS las infracciones, no solo la primera. */
+/** La notificacion no es válida. Incluye TODAS las infracciones, no solo la primera. */
 public final class ValidationException extends NotificationException {
     private static final long serialVersionUID = 1L;
 
