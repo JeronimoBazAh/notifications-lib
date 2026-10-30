@@ -10,14 +10,14 @@ import static com.example.notifications.model.Validation.hasText;
 import static com.example.notifications.model.Validation.isE164;
 
 /** Mensaje SMS. {@code from} es opcional: los proveedores recurren al remitente o servicio de mensajería que tengan configurado. */
-public record SmsNotificacion(
+public record SmsNotification(
         String id, Instant createdAt, String to, String from, String body, Map<String, String> metadata)
-        implements Notificacion {
+        implements Notification {
 
     /** Longitud máxima del cuerpo documentada por Twilio. */
     public static final int MAX_BODY_LENGTH = 1600;
 
-    public SmsNotificacion {
+    public SmsNotification {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         metadata = copyOf(metadata);
@@ -32,8 +32,8 @@ public record SmsNotificacion(
     }
 
     @Override
-    public TipoCanal channel() {
-        return TipoCanal.SMS;
+    public ChanelType channel() {
+        return ChanelType.SMS;
     }
 
     public static Builder builder() {
@@ -55,8 +55,8 @@ public record SmsNotificacion(
         public Builder body(String body) { this.body = body; return this; }
         public Builder metadata(String key, String value) { this.metadata.put(key, value); return this; }
 
-        public SmsNotificacion build() {
-            return new SmsNotificacion(id, null, to, from, body, metadata);
+        public SmsNotification build() {
+            return new SmsNotification(id, null, to, from, body, metadata);
         }
     }
 }

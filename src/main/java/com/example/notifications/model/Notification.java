@@ -8,11 +8,11 @@ import java.util.Map;
  * (un correo electrónico tiene un asunto, un SMS no); por tanto, las diferencias entre canales se expresan a través del
  * sistema de tipos, en lugar de mediante un {@code Map<String, Object>} genérico.
  */
-public interface Notificacion {
+public interface Notification {
     /** Identificador único, útil para la correlación y la idempotencia por parte de quien realiza la llamada. */
     String id();
 
-    TipoCanal channel();
+    ChanelType channel();
 
     Instant createdAt();
 

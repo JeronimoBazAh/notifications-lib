@@ -1,9 +1,9 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Secret;
+import com.example.notifications.Seguridad;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.EmailNotificacion;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.EmailNotification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -21,29 +21,29 @@ import java.util.Objects;
  * personalizations/from/subject/content. Una operación exitosa devuelve {@code 202 Accepted} con un cuerpo vacío y el
  *   identificador del mensaje en la cabecera {@code X-Message-Id}. Nota: SendGrid requiere que {@code text/plain} aparezca ANTES que {@code text/html}.
  */
-public final class SendGridEmailProvider implements NotificationProvider<EmailNotificacion> {
+public final class SendGridEmailProvider implements NotificationProvider<EmailNotification> {
     public static final String NAME = "sendgrid";
     private static final String URL = "https://api.sendgrid.com/v3/mail/send";
 
-    private final Secret apiKey;
+    private final Seguridad apiKey;
     private final Transport transport;
 
-    public SendGridEmailProvider(Secret apiKey, Transport transport) {
+    public SendGridEmailProvider(Seguridad apiKey, Transport transport) {
         this.apiKey = Objects.requireNonNull(apiKey, "apiKey");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
     /** Proveedor conectado a un transporte simulado: registra la solicitud y responde tal como lo haría SendGrid. */
-    public static SendGridEmailProvider simulated(Secret apiKey) {
+    public static SendGridEmailProvider simulated(Seguridad apiKey) {
         return new SendGridEmailProvider(apiKey, SimulatedTransports.sendGrid());
     }
 
     @Override public String name() { return NAME; }
-    @Override public TipoCanal channel() { return TipoCanal.EMAIL; }
-    @Override public Class<EmailNotificacion> notificationType() { return EmailNotificacion.class; }
+    @Override public ChanelType channel() { return ChanelType.EMAIL; }
+    @Override public Class<EmailNotification> notificationType() { return EmailNotification.class; }
 
     @Override
-    public ProviderResponse send(EmailNotificacion n) throws SendException {
+    public ProviderResponse send(EmailNotification n) throws SendException {
         Map<String, Object> personalization = new LinkedHashMap<>();
         personalization.put("to", addresses(n.to()));
         if (!n.cc().isEmpty()) personalization.put("cc", addresses(n.cc()));

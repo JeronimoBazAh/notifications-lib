@@ -1,8 +1,8 @@
 package com.example.notifications;
 
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.Notificacion;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.Notification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import org.junit.jupiter.api.Test;
@@ -12,21 +12,21 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Proves Open/Closed: a brand-new channel is added from OUTSIDE the library, without modifying it. */
+/** Demuestra el principio abierto/cerrado: se añade un canal totalmente nuevo desde FUERA de la biblioteca, sin modificarla. */
 class ExtensibilityTest {
-    static final TipoCanal WHATSAPP = TipoCanal.of("whatsapp");
+    static final ChanelType WHATSAPP = ChanelType.of("whatsapp");
 
-    record WhatsAppNotificacion(String id, String to, String text) implements Notificacion {
-        @Override public TipoCanal channel() { return WHATSAPP; }
+    record WhatsAppNotification(String id, String to, String text) implements Notification {
+        @Override public ChanelType channel() { return WHATSAPP; }
         @Override public Instant createdAt() { return Instant.EPOCH; }
         @Override public Map<String, String> metadata() { return Map.of(); }
     }
 
-    static class WhatsAppProvider implements NotificationProvider<WhatsAppNotificacion> {
+    static class WhatsAppProvider implements NotificationProvider<WhatsAppNotification> {
         @Override public String name() { return "whatsapp-cloud"; }
-        @Override public TipoCanal channel() { return WHATSAPP; }
-        @Override public Class<WhatsAppNotificacion> notificationType() { return WhatsAppNotificacion.class; }
-        @Override public ProviderResponse send(WhatsAppNotificacion n) throws SendException {
+        @Override public ChanelType channel() { return WHATSAPP; }
+        @Override public Class<WhatsAppNotification> notificationType() { return WhatsAppNotification.class; }
+        @Override public ProviderResponse send(WhatsAppNotification n) throws SendException {
             return new ProviderResponse("wamid-123", "sent to " + n.to());
         }
     }
@@ -34,7 +34,7 @@ class ExtensibilityTest {
     @Test
     void newChannelWorksWithoutChangingTheLibrary() {
         try (NotificationService service = NotificationService.builder().provider(new WhatsAppProvider()).build()) {
-            SendResult r = service.send(new WhatsAppNotificacion("1", "+5493515551234", "hola"));
+            SendResult r = service.send(new WhatsAppNotification("1", "+5493515551234", "hola"));
             assertTrue(r.isSuccess());
             assertEquals(WHATSAPP, r.channel());
             assertEquals("whatsapp-cloud", r.provider());

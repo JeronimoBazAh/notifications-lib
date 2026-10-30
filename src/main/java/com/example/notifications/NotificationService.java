@@ -1,8 +1,8 @@
 package com.example.notifications;
 
-import com.example.notifications.event.NotificationListener;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.Notificacion;
+import com.example.notifications.event.NotificacionListener;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.Notification;
 import com.example.notifications.spi.NotificationProvider;
 
 import java.util.ArrayList;
@@ -29,10 +29,10 @@ public final class NotificationService implements AutoCloseable {
     private final ExecutorService ownedExecutor;
 
     private NotificationService(Builder b) {
-        Map<TipoCanal, List<NotificationProvider<?>>> copy = new LinkedHashMap<>();
+        Map<ChanelType, List<NotificationProvider<?>>> copy = new LinkedHashMap<>();
         b.providers.forEach((channel, list) -> copy.put(channel, List.copyOf(list)));
         this.pipeline = new DeliveryPipeline(Map.copyOf(copy), b.retryPolicy, b.failoverPolicy, b.sleeper,
-                new EventPublisher(b.listeners));
+                new PublicadorEventos(b.listeners));
         if (b.executor != null) {
             this.executor = b.executor;
             this.ownedExecutor = null;
@@ -48,19 +48,19 @@ public final class NotificationService implements AutoCloseable {
     }
 
     /** Realiza el envío de forma síncrona. Nunca lanza excepciones ante problemas de entrega: examina el {@link SendResult} devuelto. */
-    public SendResult send(Notificacion notificacion) {
-        Objects.requireNonNull(notificacion, "notification");
-        return pipeline.deliver(notificacion);
+    public SendResult send(Notification notification) {
+        Objects.requireNonNull(notification, "notification");
+        return pipeline.deliver(notification);
     }
 
     /** Envío no bloqueante. El objeto «future» se completa con normalidad incluso si la entrega falla (véase {@link SendResult#error()}). */
-    public CompletableFuture<SendResult> sendAsync(Notificacion notificacion) {
-        Objects.requireNonNull(notificacion, "notification");
-        return CompletableFuture.supplyAsync(() -> pipeline.deliver(notificacion), executor);
+    public CompletableFuture<SendResult> sendAsync(Notification notification) {
+        Objects.requireNonNull(notification, "notification");
+        return CompletableFuture.supplyAsync(() -> pipeline.deliver(notification), executor);
     }
 
     /** Envía múltiples notificaciones de forma concurrente. Los resultados mantienen el orden de entrada; un fallo no afecta al resto. */
-    public CompletableFuture<List<SendResult>> sendAll(Collection<? extends Notificacion> notifications) {
+    public CompletableFuture<List<SendResult>> sendAll(Collection<? extends Notification> notifications) {
         List<CompletableFuture<SendResult>> futures = notifications.stream().map(this::sendAsync).toList();
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
                 .thenApply(v -> futures.stream().map(CompletableFuture::join).toList());
@@ -74,8 +74,8 @@ public final class NotificationService implements AutoCloseable {
     }
 
     public static final class Builder {
-        private final Map<TipoCanal, List<NotificationProvider<?>>> providers = new LinkedHashMap<>();
-        private final List<NotificationListener> listeners = new ArrayList<>();
+        private final Map<ChanelType, List<NotificationProvider<?>>> providers = new LinkedHashMap<>();
+        private final List<NotificacionListener> listeners = new ArrayList<>();
         private RetryPolicy retryPolicy = RetryPolicy.none();
         private FailoverPolicy failoverPolicy = FailoverPolicy.ALWAYS;
         private Executor executor;
@@ -98,7 +98,7 @@ public final class NotificationService implements AutoCloseable {
             return this;
         }
 
-        public Builder listener(NotificationListener listener) {
+        public Builder listener(NotificacionListener listener) {
             this.listeners.add(Objects.requireNonNull(listener, "listener"));
             return this;
         }

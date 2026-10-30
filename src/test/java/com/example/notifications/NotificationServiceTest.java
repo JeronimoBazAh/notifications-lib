@@ -3,8 +3,8 @@ package com.example.notifications;
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.NotificationException;
 import com.example.notifications.error.SendException;
-import com.example.notifications.event.EventoNotificacion;
-import com.example.notifications.model.EmailNotificacion;
+import com.example.notifications.event.NotificationEvent;
+import com.example.notifications.model.EmailNotification;
 import com.example.notifications.support.ScriptedProvider;
 import org.junit.jupiter.api.Test;
 
@@ -14,13 +14,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NotificacionServiceTest {
+class NotificationServiceTest {
     // Thread-safe: sendAll() runs deliveries concurrently.
     private final List<Duration> sleeps = new CopyOnWriteArrayList<>();
-    private final List<EventoNotificacion> events = new CopyOnWriteArrayList<>();
+    private final List<NotificationEvent> events = new CopyOnWriteArrayList<>();
 
-    private static EmailNotificacion email() {
-        return EmailNotificacion.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t").build();
+    private static EmailNotification email() {
+        return EmailNotification.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t").build();
     }
 
     private static SendException retryable() {
@@ -75,8 +75,8 @@ class NotificacionServiceTest {
         assertTrue(r.isSuccess());
         assertEquals("backup", r.provider());
         assertEquals(
-                List.of(EventoNotificacion.Type.ATTEMPT_FAILED, EventoNotificacion.Type.FAILOVER, EventoNotificacion.Type.SENT),
-                events.stream().map(EventoNotificacion::type).toList());
+                List.of(NotificationEvent.Type.ATTEMPT_FAILED, NotificationEvent.Type.FAILOVER, NotificationEvent.Type.SENT),
+                events.stream().map(NotificationEvent::type).toList());
     }
 
     @Test
@@ -113,7 +113,7 @@ class NotificacionServiceTest {
                 .build().send(email());
         assertFalse(r.isSuccess());
         assertEquals(2, r.attempts());
-        assertEquals(EventoNotificacion.Type.FAILED, events.get(events.size() - 1).type());
+        assertEquals(NotificationEvent.Type.FAILED, events.get(events.size() - 1).type());
         assertThrows(NotificationException.class, r::orElseThrow);
     }
 
@@ -148,7 +148,7 @@ class NotificacionServiceTest {
 
     @Test
     void eventsCarryNotificationMetadataForCorrelation() {
-        EmailNotificacion n = EmailNotificacion.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t")
+        EmailNotification n = EmailNotification.builder().from("a@b.com").to("c@d.com").subject("s").textBody("t")
                 .metadata("tenant", "acme").build();
         base().provider(new ScriptedProvider("p")).build().send(n);
         assertEquals("acme", events.get(0).metadata().get("tenant"));
@@ -158,10 +158,10 @@ class NotificacionServiceTest {
     void sendAllKeepsOrderAndIsolatesFailures() {
         ScriptedProvider p = new ScriptedProvider("p", fatal()); // first call fails, the rest succeed
         try (NotificationService s = base().provider(p).build()) {
-            List<EmailNotificacion> batch = List.of(email(), email(), email());
+            List<EmailNotification> batch = List.of(email(), email(), email());
             List<SendResult> results = s.sendAll(batch).join();
             assertEquals(3, results.size());
-            assertEquals(batch.stream().map(EmailNotificacion::id).toList(),
+            assertEquals(batch.stream().map(EmailNotification::id).toList(),
                     results.stream().map(SendResult::notificationId).toList());
             assertEquals(2, results.stream().filter(SendResult::isSuccess).count());
         }

@@ -2,9 +2,9 @@ package com.example.notifications;
 
 import com.example.notifications.error.ErrorCode;
 import com.example.notifications.error.SendException;
-import com.example.notifications.event.EventoNotificacion;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.Notificacion;
+import com.example.notifications.event.NotificationEvent;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.Notification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 
@@ -19,14 +19,14 @@ import java.util.concurrent.ThreadLocalRandom;
  *  * No tiene conocimiento alguno sobre hilos o procesos asíncronos: eso es responsabilidad del servicio.
  */
 final class DeliveryPipeline {
-    private final Map<TipoCanal, List<NotificationProvider<?>>> providers;
+    private final Map<ChanelType, List<NotificationProvider<?>>> providers;
     private final RetryPolicy retryPolicy;
     private final FailoverPolicy failoverPolicy;
     private final Sleeper sleeper;
-    private final EventPublisher events;
+    private final PublicadorEventos events;
 
-    DeliveryPipeline(Map<TipoCanal, List<NotificationProvider<?>>> providers, RetryPolicy retryPolicy,
-                     FailoverPolicy failoverPolicy, Sleeper sleeper, EventPublisher events) {
+    DeliveryPipeline(Map<ChanelType, List<NotificationProvider<?>>> providers, RetryPolicy retryPolicy,
+                     FailoverPolicy failoverPolicy, Sleeper sleeper, PublicadorEventos events) {
         this.providers = providers;
         this.retryPolicy = retryPolicy;
         this.failoverPolicy = failoverPolicy;
@@ -35,7 +35,7 @@ final class DeliveryPipeline {
     }
 
     /** Nunca lanza excepciones: cada resultado se expresa como un {@link SendResult}. */
-    SendResult deliver(Notificacion n) {
+    SendResult deliver(Notification n) {
         try {
             return attemptDelivery(n);
         } catch (RuntimeException e) {
@@ -44,7 +44,7 @@ final class DeliveryPipeline {
         }
     }
 
-    private SendResult attemptDelivery(Notificacion n) {
+    private SendResult attemptDelivery(Notification n) {
         List<NotificationProvider<?>> chain = providers.getOrDefault(n.channel(), List.of());
         if (chain.isEmpty()) {
             return fail(n, null, 0, new SendException(ErrorCode.NO_PROVIDER, null, false,
@@ -59,7 +59,7 @@ final class DeliveryPipeline {
                 attempts++;
                 try {
                     ProviderResponse response = dispatch(provider, n);
-                    events.publish(EventoNotificacion.Type.SENT, n, provider.name(), attempts, null, response.messageId());
+                    events.publish(NotificationEvent.Type.SENT, n, provider.name(), attempts, null, response.messageId());
                     return new SendResult.Sent(n.id(), n.channel(), provider.name(), response.messageId(), attempts);
                 } catch (SendException e) {
                     last = e;
@@ -67,7 +67,7 @@ final class DeliveryPipeline {
                     last = new SendException(ErrorCode.UNEXPECTED, provider.name(), false,
                             "Unexpected provider error: " + e.getMessage(), e);
                 }
-                events.publish(EventoNotificacion.Type.ATTEMPT_FAILED, n, provider.name(), attempts, last.code(), last.getMessage());
+                events.publish(NotificationEvent.Type.ATTEMPT_FAILED, n, provider.name(), attempts, last.code(), last.getMessage());
 
                 if (!last.isRetryable() || attempt == retryPolicy.maxAttempts()) {
                     break;
@@ -82,13 +82,13 @@ final class DeliveryPipeline {
             if (!hasNext || !failoverPolicy.allows(last)) {
                 break;
             }
-            events.publish(EventoNotificacion.Type.FAILOVER, n, provider.name(), attempts, last.code(), chain.get(p + 1).name());
+            events.publish(NotificationEvent.Type.FAILOVER, n, provider.name(), attempts, last.code(), chain.get(p + 1).name());
         }
         return fail(n, last.provider(), attempts, last);
     }
 
     /** Realiza una conversión de captura del comodín, de modo que la conversión de tipo se verifique en tiempo de ejecución en lugar de ser una conversión no verificada. */
-    private static <N extends Notificacion> ProviderResponse dispatch(NotificationProvider<N> provider, Notificacion n)
+    private static <N extends Notification> ProviderResponse dispatch(NotificationProvider<N> provider, Notification n)
             throws SendException {
         if (!provider.notificationType().isInstance(n)) {
             throw new SendException(ErrorCode.UNEXPECTED, provider.name(), false,
@@ -97,8 +97,8 @@ final class DeliveryPipeline {
         return provider.send(provider.notificationType().cast(n));
     }
 
-    private SendResult fail(Notificacion n, String provider, int attempts, SendException error) {
-        events.publish(EventoNotificacion.Type.FAILED, n, provider, attempts, error.code(), error.getMessage());
+    private SendResult fail(Notification n, String provider, int attempts, SendException error) {
+        events.publish(NotificationEvent.Type.FAILED, n, provider, attempts, error.code(), error.getMessage());
         return new SendResult.Failed(n.id(), n.channel(), provider, attempts, error);
     }
 

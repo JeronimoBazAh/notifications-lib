@@ -1,8 +1,8 @@
 package com.example.notifications.spi;
 
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.Notificacion;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.Notification;
 
 /**
  * Interfaz del proveedor de servicios: lo ÚNICO que un nuevo proveedor (o un canal completamente nuevo) debe implementar.
@@ -14,12 +14,12 @@ import com.example.notifications.model.Notificacion;
 
 
  */
-public interface NotificationProvider<N extends Notificacion> {
+public interface NotificationProvider<N extends Notification> {
 
     /** Nombre estable y legible por humanos, utilizado en resultados, eventos y registros (p. ej., "sendgrid"). */
     String name();
 
-    TipoCanal channel();
+    ChanelType channel();
 
     /** Permite al servicio realizar el envío de forma tipocura, sin necesidad de conversiones de tipo no verificadas. */
     Class<N> notificationType();

@@ -1,7 +1,7 @@
 package com.example.notifications.event;
 
 import com.example.notifications.error.ErrorCode;
-import com.example.notifications.model.TipoCanal;
+import com.example.notifications.model.ChanelType;
 
 import java.time.Instant;
 import java.util.Map;
@@ -12,8 +12,8 @@ import java.util.Map;
  * @param attempt  contador global de intentos para esta notificación (a través de los distintos proveedores); 0 si no se ha realizado ninguno
  * @param metadata metadatos de la notificación (inquilino, identificador de correlación, etc.) para que los suscriptores puedan correlacionar los eventos
  */
-public record EventoNotificacion(
-        Type type, String notificationId, TipoCanal channel, String provider, int attempt,
+public record NotificationEvent(
+        Type type, String notificationId, ChanelType channel, String provider, int attempt,
         ErrorCode errorCode, String detail, Map<String, String> metadata, Instant timestamp) {
 
     public enum Type {

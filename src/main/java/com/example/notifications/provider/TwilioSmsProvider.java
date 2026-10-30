@@ -1,9 +1,9 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Secret;
+import com.example.notifications.Seguridad;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.SmsNotificacion;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.SmsNotification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -20,31 +20,31 @@ import java.util.Objects;
 
 
  */
-public final class TwilioSmsProvider implements NotificationProvider<SmsNotificacion> {
+public final class TwilioSmsProvider implements NotificationProvider<SmsNotification> {
     public static final String NAME = "twilio";
 
     private final String accountSid;
-    private final Secret authToken;
+    private final Seguridad authToken;
     private final String defaultFrom;
     private final Transport transport;
 
-    /** @param defaultFrom remitente que se utiliza cuando la notificación no especifica ninguno */    public TwilioSmsProvider(String accountSid, Secret authToken, String defaultFrom, Transport transport) {
+    /** @param defaultFrom remitente que se utiliza cuando la notificación no especifica ninguno */    public TwilioSmsProvider(String accountSid, Seguridad authToken, String defaultFrom, Transport transport) {
         this.accountSid = Objects.requireNonNull(accountSid, "accountSid");
         this.authToken = Objects.requireNonNull(authToken, "authToken");
         this.defaultFrom = Objects.requireNonNull(defaultFrom, "defaultFrom");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
-    public static TwilioSmsProvider simulated(String accountSid, Secret authToken, String defaultFrom) {
+    public static TwilioSmsProvider simulated(String accountSid, Seguridad authToken, String defaultFrom) {
         return new TwilioSmsProvider(accountSid, authToken, defaultFrom, SimulatedTransports.twilio());
     }
 
     @Override public String name() { return NAME; }
-    @Override public TipoCanal channel() { return TipoCanal.SMS; }
-    @Override public Class<SmsNotificacion> notificationType() { return SmsNotificacion.class; }
+    @Override public ChanelType channel() { return ChanelType.SMS; }
+    @Override public Class<SmsNotification> notificationType() { return SmsNotification.class; }
 
     @Override
-    public ProviderResponse send(SmsNotificacion n) throws SendException {
+    public ProviderResponse send(SmsNotification n) throws SendException {
         String body = new FormBody()
                 .add("To", n.to())
                 .add("From", n.from() != null ? n.from() : defaultFrom)

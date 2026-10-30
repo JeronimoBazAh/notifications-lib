@@ -10,16 +10,16 @@ import static com.example.notifications.model.Validation.hasText;
 
 /**
  * Mensaje de Slack. {@code target} es el ID o nombre de un canal (p. ej., "#alerts"); no se denomina "channel" porque
- * {@link Notificacion#channel()} ya hace referencia al tipo de canal de entrega. {@code threadTs} permite responder dentro de un hilo.
+ * {@link Notification#channel()} ya hace referencia al tipo de canal de entrega. {@code threadTs} permite responder dentro de un hilo.
  */
-public record SlackNotificacion(
+public record SlackNotification(
         String id, Instant createdAt, String target, String text, String threadTs, Map<String, String> metadata)
-        implements Notificacion {
+        implements Notification {
 
     /** Slack trunca los mensajes que superan los 40 000 caracteres. */
     public static final int MAX_TEXT_LENGTH = 40_000;
 
-    public SlackNotificacion {
+    public SlackNotification {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         metadata = copyOf(metadata);
@@ -32,8 +32,8 @@ public record SlackNotificacion(
     }
 
     @Override
-    public TipoCanal channel() {
-        return TipoCanal.SLACK;
+    public ChanelType channel() {
+        return ChanelType.SLACK;
     }
 
     public static Builder builder() {
@@ -55,8 +55,8 @@ public record SlackNotificacion(
         public Builder threadTs(String v) { threadTs = v; return this; }
         public Builder metadata(String k, String v) { metadata.put(k, v); return this; }
 
-        public SlackNotificacion build() {
-            return new SlackNotificacion(id, null, target, text, threadTs, metadata);
+        public SlackNotification build() {
+            return new SlackNotification(id, null, target, text, threadTs, metadata);
         }
     }
 }

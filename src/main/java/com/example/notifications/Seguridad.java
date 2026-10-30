@@ -7,28 +7,28 @@ import java.util.Objects;
  * El valor original solo es accesible mediante una llamada explícita a {@link #reveal()}, la cual es utilizada por los proveedores
  * en el último momento posible (al construir la cabecera Authorization).
  */
-public final class Secret {
+public final class Seguridad {
     private final String value;
 
-    private Secret(String value) {
+    private Seguridad(String value) {
         this.value = value;
     }
 
-    public static Secret of(String value) {
+    public static Seguridad of(String value) {
         Objects.requireNonNull(value, "secret value");
         if (value.isBlank()) {
             throw new IllegalArgumentException("Secret must not be blank");
         }
-        return new Secret(value);
+        return new Seguridad(value);
     }
 
     /** Lee el secreto de una variable de entorno. Falla de inmediato si no está presente. */
-    public static Secret fromEnv(String variable) {
+    public static Seguridad fromEnv(String variable) {
         String v = System.getenv(variable);
         if (v == null || v.isBlank()) {
             throw new IllegalStateException("Environment variable '" + variable + "' is not set");
         }
-        return new Secret(v);
+        return new Seguridad(v);
     }
 
     public String reveal() {

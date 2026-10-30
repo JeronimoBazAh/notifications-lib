@@ -12,11 +12,11 @@ import static com.example.notifications.model.Validation.hasText;
  * Notificación push para móviles. Un único destino: un {@code deviceToken} o un {@code topic}.
  * {@code data} es un mapa de cadenas (String a String), ya que FCM (así como las claves personalizadas de APNs) solo admite valores de tipo cadena.
  */
-public record PushNotificacion(
+public record PushNotification(
         String id, Instant createdAt, String deviceToken, String topic, String title, String body,
-        Map<String, String> data, Map<String, String> metadata) implements Notificacion {
+        Map<String, String> data, Map<String, String> metadata) implements Notification {
 
-    public PushNotificacion {
+    public PushNotification {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         data = copyOf(data);
@@ -30,8 +30,8 @@ public record PushNotificacion(
     }
 
     @Override
-    public TipoCanal channel() {
-        return TipoCanal.PUSH;
+    public ChanelType channel() {
+        return ChanelType.PUSH;
     }
 
     public static Builder builder() {
@@ -56,8 +56,8 @@ public record PushNotificacion(
         public Builder data(String key, String value) { this.data.put(key, value); return this; }
         public Builder metadata(String key, String value) { this.metadata.put(key, value); return this; }
 
-        public PushNotificacion build() {
-            return new PushNotificacion(id, null, deviceToken, topic, title, body, data, metadata);
+        public PushNotification build() {
+            return new PushNotification(id, null, deviceToken, topic, title, body, data, metadata);
         }
     }
 }

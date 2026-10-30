@@ -12,11 +12,11 @@ import static com.example.notifications.model.Validation.hasText;
 import static com.example.notifications.model.Validation.isEmail;
 
 /** Mensaje de correo electrónico. Validado en el momento de su creación: no puede existir una instancia no válida. */
-public record EmailNotificacion(
+public record EmailNotification(
         String id, Instant createdAt, String from, List<String> to, List<String> cc, List<String> bcc,
-        String subject, String textBody, String htmlBody, Map<String, String> metadata) implements Notificacion {
+        String subject, String textBody, String htmlBody, Map<String, String> metadata) implements Notification {
 
-    public EmailNotificacion {
+    public EmailNotification {
         id = id == null ? UUID.randomUUID().toString() : id;
         createdAt = createdAt == null ? Instant.now() : createdAt;
         to = copyOf(to);
@@ -36,8 +36,8 @@ public record EmailNotificacion(
     }
 
     @Override
-    public TipoCanal channel() {
-        return TipoCanal.EMAIL;
+    public ChanelType channel() {
+        return ChanelType.EMAIL;
     }
 
     public static Builder builder() {
@@ -66,8 +66,8 @@ public record EmailNotificacion(
         public Builder metadata(String key, String value) { this.metadata.put(key, value); return this; }
 
         /** @throws com.example.notifications.error.ValidationException enumerando todas las infracciones */
-        public EmailNotificacion build() {
-            return new EmailNotificacion(id, null, from, to, cc, bcc, subject, textBody, htmlBody, metadata);
+        public EmailNotification build() {
+            return new EmailNotification(id, null, from, to, cc, bcc, subject, textBody, htmlBody, metadata);
         }
     }
 }

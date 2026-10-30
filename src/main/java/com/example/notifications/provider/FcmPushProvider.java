@@ -1,9 +1,9 @@
 package com.example.notifications.provider;
 
-import com.example.notifications.Secret;
+import com.example.notifications.Seguridad;
 import com.example.notifications.error.SendException;
-import com.example.notifications.model.TipoCanal;
-import com.example.notifications.model.PushNotificacion;
+import com.example.notifications.model.ChanelType;
+import com.example.notifications.model.PushNotification;
 import com.example.notifications.spi.NotificationProvider;
 import com.example.notifications.spi.ProviderResponse;
 import com.example.notifications.spi.Transport;
@@ -23,29 +23,29 @@ import java.util.function.Supplier;
  *  * Los tokens de acceso de FCM tienen una vida útil corta (~1 h); por ello, el proveedor acepta un {@code Supplier<Secret>}
  *  * que el emisor implementa incluyendo su propia lógica de renovación de tokens (por ejemplo, mediante credenciales de cuenta de servicio de Google).
  */
-public final class FcmPushProvider implements NotificationProvider<PushNotificacion> {
+public final class FcmPushProvider implements NotificationProvider<PushNotification> {
     public static final String NAME = "fcm";
 
     private final String projectId;
-    private final Supplier<Secret> accessToken;
+    private final Supplier<Seguridad> accessToken;
     private final Transport transport;
 
-    public FcmPushProvider(String projectId, Supplier<Secret> accessToken, Transport transport) {
+    public FcmPushProvider(String projectId, Supplier<Seguridad> accessToken, Transport transport) {
         this.projectId = Objects.requireNonNull(projectId, "projectId");
         this.accessToken = Objects.requireNonNull(accessToken, "accessToken");
         this.transport = Objects.requireNonNull(transport, "transport");
     }
 
-    public static FcmPushProvider simulated(String projectId, Supplier<Secret> accessToken) {
+    public static FcmPushProvider simulated(String projectId, Supplier<Seguridad> accessToken) {
         return new FcmPushProvider(projectId, accessToken, SimulatedTransports.fcm(projectId));
     }
 
     @Override public String name() { return NAME; }
-    @Override public TipoCanal channel() { return TipoCanal.PUSH; }
-    @Override public Class<PushNotificacion> notificationType() { return PushNotificacion.class; }
+    @Override public ChanelType channel() { return ChanelType.PUSH; }
+    @Override public Class<PushNotification> notificationType() { return PushNotification.class; }
 
     @Override
-    public ProviderResponse send(PushNotificacion n) throws SendException {
+    public ProviderResponse send(PushNotification n) throws SendException {
         Map<String, Object> message = new LinkedHashMap<>();
         if (n.deviceToken() != null && !n.deviceToken().isBlank()) message.put("token", n.deviceToken());
         else message.put("topic", n.topic());
