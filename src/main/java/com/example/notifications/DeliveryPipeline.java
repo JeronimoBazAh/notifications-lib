@@ -60,7 +60,7 @@ final class DeliveryPipeline {
                 try {
                     ProviderResponse response = dispatch(provider, n);
                     events.publish(EventoNotificacion.Type.SENT, n, provider.name(), attempts, null, response.messageId());
-                    return SendResult.success(n.id(), n.channel(), provider.name(), response.messageId(), attempts);
+                    return new SendResult.Sent(n.id(), n.channel(), provider.name(), response.messageId(), attempts);
                 } catch (SendException e) {
                     last = e;
                 } catch (RuntimeException e) {
@@ -99,7 +99,7 @@ final class DeliveryPipeline {
 
     private SendResult fail(Notificacion n, String provider, int attempts, SendException error) {
         events.publish(EventoNotificacion.Type.FAILED, n, provider, attempts, error.code(), error.getMessage());
-        return SendResult.failure(n.id(), n.channel(), provider, attempts, error);
+        return new SendResult.Failed(n.id(), n.channel(), provider, attempts, error);
     }
 
     private boolean pause(Duration delay) {

@@ -3,38 +3,77 @@ package com.example.notifications;
 import com.example.notifications.error.NotificationException;
 import com.example.notifications.model.TipoCanal;
 
+import java.util.Objects;
+
 /**
- * Resultado de un envío. Los errores de entrega se devuelven como DATOS (nunca generados), lo que mantiene el proceso por lotes y asíncrono
- * fluye simple. Las personas que llaman y prefieren excepciones pueden llamar a {@link #orElseThrow()}.
- *
- * @param provider proveedor que entregó, o el último que intentó en caso de error (nulo si no hay ninguno)
- * @param providerMessageId ID del lado del proveedor en caso de éxito, nulo en caso de error
- * @param attempts el total de intentos realizados, entre proveedores
- * @param error nulo en caso de éxito
+ * Outcome of a send: either {@link Sent} or {@link Failed}. Modelled as a sealed hierarchy so an impossible state
+ * (e.g. "sent" carrying an error, or "failed" without one) cannot be represented.
+ * <p>
+ * Delivery failures are returned as DATA (never thrown), which keeps batch and async flows simple. Callers who
+ * prefer exceptions can call {@link #orElseThrow()}; callers who prefer pattern matching can switch over the two cases:
+ * <pre>{@code
+ * switch (result) {
+ *     case SendResult.Sent s   -> log(s.providerMessageId());
+ *     case SendResult.Failed f -> alert(f.error().code());
+ * }
+ * }</pre>
  */
-public record SendResult(
-        String notificationId, TipoCanal channel, Status status, String provider,
-        String providerMessageId, int attempts, NotificationException error) {
+public sealed interface SendResult permits SendResult.Sent, SendResult.Failed {
 
-    public enum Status { SENT, FAILED }
+    String notificationId();
 
-    public boolean isSuccess() {
-        return status == Status.SENT;
+    TipoCanal channel();
+
+    /** Provider that delivered, or the last one tried on failure (null if none was involved). */
+    String provider();
+
+    /** Total attempts made, across providers. */
+    int attempts();
+
+    /** Provider-side id on success, {@code null} on failure. */
+    String providerMessageId();
+
+    /** The failure, or {@code null} on success. */
+    NotificationException error();
+
+    default boolean isSuccess() {
+        return this instanceof Sent;
     }
 
-    /** @throws NotificationException the failure cause, if the send failed */
-    public SendResult orElseThrow() {
-        if (error != null) {
+    /** @return this result if it succeeded; @throws NotificationException the failure cause otherwise */
+    SendResult orElseThrow();
+
+    /** Delivered. {@code providerMessageId} may be null for providers that do not return one. */
+    record Sent(String notificationId, TipoCanal channel, String provider, String providerMessageId, int attempts)
+            implements SendResult {
+
+        @Override
+        public NotificationException error() {
+            return null;
+        }
+
+        @Override
+        public SendResult orElseThrow() {
+            return this;
+        }
+    }
+
+    /** Not delivered. {@code error} is always present. */
+    record Failed(String notificationId, TipoCanal channel, String provider, int attempts, NotificationException error)
+            implements SendResult {
+
+        public Failed {
+            Objects.requireNonNull(error, "error");
+        }
+
+        @Override
+        public String providerMessageId() {
+            return null;
+        }
+
+        @Override
+        public SendResult orElseThrow() {
             throw error;
         }
-        return this;
-    }
-
-    static SendResult success(String id, TipoCanal channel, String provider, String messageId, int attempts) {
-        return new SendResult(id, channel, Status.SENT, provider, messageId, attempts, null);
-    }
-
-    static SendResult failure(String id, TipoCanal channel, String provider, int attempts, NotificationException error) {
-        return new SendResult(id, channel, Status.FAILED, provider, null, attempts, error);
     }
 }
